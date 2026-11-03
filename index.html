@@ -3,23 +3,23 @@
 <style>
 *{box-sizing:border-box;margin:0}
 html,body{width:1920px;height:1080px;overflow:hidden;background:#101010;color:#fff;font-family:"Segoe UI","Selawik","Open Sans",sans-serif}
-.abs{position:absolute}
-#top{position:absolute;left:130px;top:44px;display:flex;gap:6px}
-.sm{width:64px;height:64px;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:300}
+#top{position:absolute;left:130px;top:44px;display:flex}
+.sm{position:relative;width:64px;height:64px;margin-right:6px;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:300}
 .sm svg{width:40px;height:40px}
-#right{position:absolute;right:130px;top:40px;display:flex;align-items:center;gap:22px}
-#dt{font-size:20px;color:#107c10;letter-spacing:1px;text-transform:uppercase}
-#ring{width:76px;height:76px;border:5px solid #107c10;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:400}
-#tabs{position:absolute;left:130px;top:150px;display:flex;gap:44px}
-.tab{font-size:54px;font-weight:200;color:#6e6e6e;padding-bottom:4px;border-bottom:5px solid transparent}
+#right{position:absolute;right:130px;top:40px;display:flex;align-items:center}
+#dt{font-size:20px;color:#107c10;letter-spacing:1px;text-transform:uppercase;margin-right:22px}
+#ring{width:76px;height:76px;border:5px solid #107c10;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px}
+#tabs{position:absolute;left:130px;top:150px;display:flex}
+.tab{font-size:54px;font-weight:200;color:#6e6e6e;padding-bottom:4px;margin-right:44px;border-bottom:5px solid transparent}
 .tab.on{color:#fff}.tab.sel{border-bottom-color:#107c10}
-#grid{position:absolute;left:130px;top:300px;display:grid;grid-template-columns:repeat(8,200px);grid-auto-rows:200px;gap:8px}
-.tile{position:relative;overflow:hidden;background:#555}
-.tile.nv{margin-left:32px}
-.tile.sel,.sm.sel{outline:5px solid #fff;outline-offset:0;z-index:5}
-.tile.sel{transform:scale(1.03)}
+#view{position:absolute;left:0;top:300px;width:1920px;height:700px;overflow:hidden}
+#strip{position:absolute;left:0;top:0;width:4400px;height:700px;transition:transform .55s cubic-bezier(.22,.8,.2,1)}
+.panel{position:absolute;top:0;height:700px}
+.tile{position:absolute;overflow:hidden;background:#555}
+.tile.sel:after,.sm.sel:after{content:"";position:absolute;left:0;top:0;right:0;bottom:0;border:5px solid #fff;z-index:6}
 .ic{position:absolute;left:0;right:0;top:34px;text-align:center;font-size:84px;font-weight:200;line-height:92px}
 .ic svg{width:88px;height:88px}
+.big .ic{top:62px}.big .ic svg{width:150px;height:150px}
 .n{position:absolute;left:16px;bottom:12px;font-size:22px}
 .lab{position:absolute;left:0;bottom:0;background:rgba(0,0,0,.72);padding:10px 22px;font-size:34px;font-weight:300}
 .wm{position:absolute;right:30px;top:-20px;font-size:380px;font-weight:700;opacity:.22;line-height:1}
@@ -30,22 +30,18 @@ html,body{width:1920px;height:1080px;overflow:hidden;background:#101010;color:#f
 .pn{font-size:26px;font-weight:600}.pl{font-size:19px;color:#cfe8cf}
 .pc{position:absolute;left:16px;bottom:12px;font-size:20px;line-height:1.2}
 .pc b{display:block;font-size:48px;font-weight:300}
-#nvl{position:absolute;left:1410px;top:262px;font-size:19px;color:#aaa;letter-spacing:1px;text-transform:uppercase}
-.pk{position:absolute;pointer-events:none}
-#apps{position:absolute;inset:0;background:#101010f2;display:none;padding:60px 130px;z-index:20}
+.lbl{position:absolute;font-size:19px;color:#aaa;letter-spacing:1px;text-transform:uppercase}
+#apps{position:absolute;left:0;top:0;right:0;bottom:0;background:#101010f2;display:none;padding:60px 130px;z-index:20}
 #apps h2{font-size:48px;font-weight:200;margin-bottom:24px}
-#list{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 12px;height:820px;overflow:hidden;align-content:start}
-.it{padding:14px 20px;background:#2d2d2d;font-size:28px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#list{height:820px;overflow:hidden}
+.it{display:inline-block;vertical-align:top;width:32.5%;margin:0 .6% 8px 0;padding:14px 20px;background:#2d2d2d;font-size:28px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .it small{display:block;font-size:18px;color:#999}.it.sel{background:#107c10}
 #toast{position:absolute;right:130px;bottom:40px;max-width:900px;background:#c50f1f;padding:14px 22px;font-size:24px;display:none;z-index:30}
 </style></head><body>
 <div id="top"></div>
 <div id="right"><div id="dt"></div><div id="ring"></div></div>
 <div id="tabs"></div>
-<div id="nvl"></div>
-<div id="grid"></div>
-<div class="pk" style="left:0;top:300px;width:96px;height:616px;background:linear-gradient(#0e7a0d 0 200px,transparent 200px 208px,#0e7a0d 208px 408px,transparent 408px 416px,#0e7a0d 416px)"></div>
-<div class="pk" style="left:1836px;top:300px;width:84px;height:408px;background:linear-gradient(#2a2a2a 0 200px,transparent 200px 208px,#3b2a14 208px)"></div>
+<div id="view"><div id="strip"></div></div>
 <div id="apps"><h2>Mis apps (el ID aparece bajo cada nombre)</h2><div id="list"></div></div>
 <div id="toast"></div>
 <script>
@@ -55,18 +51,19 @@ var APPS={
  netflix:{n:"Netflix",id:"11101200001",g:"N",bg:"#b20710"},
  youtube:{n:"YouTube",id:"111299001912",ic:"play",bg:"#4a4a4a"},
  prime:{n:"Prime Video",id:"3201512006785",g:"P",bg:"#00a2e8"},
- spotify:{n:"Spotify",id:"3201606009684",g:"S",bg:"linear-gradient(135deg,#1db954,#0a3d1c)"},
+ spotify:{n:"Spotify",id:"3201606009684",g:"S",bg:"#168a3f"},
  disney:{n:"Disney+",id:"3201901017640",g:"D+",bg:"#1b44c8"},
- plex:{n:"Plex",id:"3201512006963",g:"X",bg:"linear-gradient(135deg,#e5a00d,#4a3205)"}
+ plex:{n:"Plex",id:"3201512006963",g:"X",bg:"#b7790a"}
 };
-// Entradas de video. Cambiar de fuente desde una app suele estar bloqueado
-// en TVs Samsung de 2017; si "id" tiene un ID de app válido, se usa como alternativa.
+// Cambiar de fuente desde una app suele estar bloqueado en TVs Samsung 2017.
+// Si encuentras un ID de app de fuentes en "Mis apps", ponlo en "id".
 var SRC={
  h1:{n:"HDMI 1",type:"HDMI",num:1,id:""},h2:{n:"HDMI 2",type:"HDMI",num:2,id:""},
  h3:{n:"HDMI 3",type:"HDMI",num:3,id:""},av:{n:"AV / Componente",type:"COMPONENT",num:1,id:""},
  tv:{n:"TV en vivo",type:"TV",num:1,id:""},menu:{n:"Menú de fuentes",type:"",num:0,id:"",menu:1}
 };
-var MENU_SOURCE_ID=""; // ID de la app de fuentes del TV si la encuentras en "Mis apps"
+var MENU_SOURCE_ID="";
+var DEFAULT=["a:netflix","a:youtube","a:prime","s:h1","a:spotify","a:disney","s:h2","a:plex"];
 var TOPBAR=["netflix","youtube","prime","spotify","disney","plex"];
 var TOPCOL={netflix:"#e8432e",youtube:"#c4302b",prime:"#00a2e8",spotify:"#1db954",disney:"#1b44c8",plex:"#e5a00d"};
 // ==========================
@@ -80,65 +77,81 @@ var IC={
  power:'<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3.5"><path d="M24 6v18M14 13a16 16 0 1 0 20 0"/></svg>',
  globe:'<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3"><circle cx="24" cy="24" r="17"/><path d="M7 24h34M24 7c-9 9-9 25 0 34M24 7c9 9 9 25 0 34"/></svg>'
 };
-var $=function(i){return document.getElementById(i)},apps=[],ai=0,mode="home",page="home",cur=0,fixed=[],pitems=[],items=[];
+var U=208,G="#0e7a0d",MARGIN=130,GAP=48;
+var $=function(i){return document.getElementById(i)},apps=[],ai=0,mode="home";
 function toast(t){var e=$("toast");e.textContent=t;e.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(function(){e.style.display="none"},4500)}
 function launch(id){if(!id){toast("Este mosaico no tiene ID de app. Edita index.html.");return}
  try{tizen.application.launch(id,null,function(e){toast("No se pudo abrir: "+e.message)})}catch(e){toast("Solo funciona dentro del TV ("+id+")")}}
 function exitApp(){try{tizen.application.getCurrentApplication().exit()}catch(e){}}
 function setSource(s){
  if(s.menu&&MENU_SOURCE_ID){launch(MENU_SOURCE_ID);return}
- try{tizen.tvwindow.setSource({type:s.type,number:s.num},function(){},function(e){fallback(s,e.message)},"MAIN")}
- catch(e){fallback(s,"")}}
+ try{tizen.tvwindow.setSource({type:s.type,number:s.num},function(){},function(e){fallback(s,e.message)},"MAIN")}catch(e){fallback(s,"")}}
 function fallback(s,m){var id=s.menu?MENU_SOURCE_ID:s.id;
  if(id)launch(id);else toast("Este TV no deja cambiar de fuente desde apps. Usa el botón SOURCE del control. "+(m||""))}
-function appTile(k,o){var a=APPS[k],t={n:a.n,id:a.id,bg:a.bg,g:a.g,ic:a.ic};for(var x in o)t[x]=o[x];return t}
-function srcTile(k,o){var s=SRC[k],t={n:s.n,src:s,ic:k=="av"?"av":k=="tv"?"tv":k=="menu"?"monitor":"hdmi",bg:"#555"};for(var x in o)t[x]=o[x];return t}
-var G="#0e7a0d";
-var PAGES={
- pins:[appTile("netflix",{c:1,r:1,w:2,h:2,lab:1,art:1}),appTile("youtube",{c:3,r:1,w:2,h:1}),appTile("prime",{c:5,r:1,w:1,h:1}),
-  appTile("spotify",{c:3,r:2,w:1,h:1}),appTile("disney",{c:4,r:2,w:1,h:1}),appTile("plex",{c:5,r:2,w:1,h:1}),
-  {n:"Mis apps",ic:"grid",act:"apps",bg:G,c:1,r:3,w:2,h:1},{n:"Salir",ic:"power",act:"exit",bg:"#444",c:3,r:3,w:1,h:1}],
- home:[{prof:1,act:"apps",bg:G,c:1,r:1,w:1,h:3},
-  appTile("netflix",{c:2,r:1,w:4,h:2,lab:1,art:1}),
-  {n:"Fuentes",ic:"monitor",act:"page:fuentes",bg:G,c:6,r:1,w:1,h:1},
-  {n:"Mis apps",ic:"grid",act:"apps",bg:G,c:6,r:2,w:1,h:1},
-  appTile("youtube",{c:2,r:3}),appTile("prime",{c:3,r:3}),appTile("spotify",{c:4,r:3}),appTile("disney",{c:5,r:3}),
-  {n:"Salir",ic:"power",act:"exit",bg:G,c:6,r:3,w:1,h:1},
-  srcTile("h1",{c:7,r:1,w:2,h:1,cls:"nv"}),srcTile("h2",{c:7,r:2,w:2,h:1,cls:"nv"}),appTile("plex",{c:7,r:3,w:2,h:1,cls:"nv"})],
- fuentes:[srcTile("h1",{c:1,r:1,w:2,h:2,bg:"linear-gradient(135deg,#2b3a55,#0d1320)"}),srcTile("h2",{c:3,r:1,w:2,h:1,bg:"#1b44c8"}),
-  srcTile("h3",{c:5,r:1}),srcTile("av",{c:3,r:2}),srcTile("tv",{c:4,r:2,bg:G}),srcTile("menu",{c:5,r:2,bg:G})]
-};
-var TABS=[["pins","Favoritos"],["home","Inicio"],["fuentes","Fuentes"]];
-function mkTile(t){var d=document.createElement("div");d.className="tile"+(t.prof?" prof":"")+(t.cls?" "+t.cls:"");
- d.style.cssText="grid-column:"+t.c+"/span "+t.w+";grid-row:"+t.r+"/span "+t.h+";background:"+(t.art&&t.bg=="#b20710"?"radial-gradient(circle at 70% 35%,#e5484d,#7a0b11 40%,#1a0507 90%)":t.bg);
+// ---- recientes (se guardan al lanzar desde OneDash) ----
+function allKeys(){var o=[],k;for(k in APPS)o.push("a:"+k);for(k in SRC)if(k!="menu")o.push("s:"+k);return o}
+function getRec(){var s=[],all=allKeys(),out=[];try{s=JSON.parse(localStorage.getItem("od_rec")||"[]")}catch(e){}
+ s.concat(DEFAULT).concat(all).forEach(function(k){if(all.indexOf(k)>=0&&out.indexOf(k)<0)out.push(k)});return out}
+function record(k){if(!k)return;var r=getRec().filter(function(x){return x!=k});r.unshift(k);try{localStorage.setItem("od_rec",JSON.stringify(r.slice(0,20)))}catch(e){}}
+function ext(t,o){for(var x in o)t[x]=o[x];return t}
+function appTile(k,o){var a=APPS[k];return ext({key:"a:"+k,n:a.n,id:a.id,bg:a.bg,g:a.g,ic:a.ic},o)}
+function srcTile(k,o){var s=SRC[k];return ext({key:k=="menu"?"":"s:"+k,n:s.n,src:s,ic:k=="av"?"av":k=="tv"?"tv":k=="menu"?"monitor":"hdmi",bg:"#555"},o)}
+function ent(key,o){return key.charAt(0)=="a"?appTile(key.slice(2),o):srcTile(key.slice(2),o)}
+function homeTiles(){var r=getRec(),t=[{prof:1,act:"apps",bg:G,c:1,r:1,w:1,h:3},ent(r[0],{c:2,r:1,w:4,h:2,lab:1,art:1})],i;
+ for(i=1;i<=4;i++)t.push(ent(r[i],{c:i+1,r:3,w:1,h:1}));
+ t.push({n:"Fuentes",ic:"monitor",act:"panel:2",bg:G,c:6,r:1,w:1,h:1},{n:"Mis apps",ic:"grid",act:"apps",bg:G,c:6,r:2,w:1,h:1},{n:"Salir",ic:"power",act:"exit",bg:G,c:6,r:3,w:1,h:1});
+ for(i=5;i<=7;i++)t.push(ent(r[i],{c:7,r:i-4,w:2,h:1,nv:1}));return t}
+var PANELS=[
+ {name:"Favoritos",cols:6,tiles:function(){return[appTile("netflix",{c:1,r:1,w:2,h:2,lab:1,art:1}),appTile("youtube",{c:3,r:1,w:2,h:1}),appTile("prime",{c:5,r:1}),
+  appTile("spotify",{c:3,r:2}),appTile("disney",{c:4,r:2}),appTile("plex",{c:5,r:2}),
+  {n:"Mis apps",ic:"grid",act:"apps",bg:G,c:1,r:3,w:2,h:1},{n:"Salir",ic:"power",act:"exit",bg:"#444",c:3,r:3}]}},
+ {name:"Inicio",cols:8,tiles:homeTiles,label:{t:"Recientes",x:6*U+32,y:-38}},
+ {name:"Fuentes",cols:6,tiles:function(){return[srcTile("h1",{c:1,r:1,w:2,h:2,lab:1,bg:"#2b3a55"}),srcTile("h2",{c:3,r:1,w:2,h:1,bg:"#1b44c8"}),
+  srcTile("h3",{c:5,r:1}),srcTile("av",{c:3,r:2}),srcTile("tv",{c:4,r:2,bg:G}),srcTile("menu",{c:5,r:2,bg:G})]}}
+];
+var PX=[],tiles=[],tabs=[],tops=[],panelEl=[],curPanel=1,cur=null;
+function mkTile(t){var d=document.createElement("div");d.className="tile"+(t.w*t.h>=4?" big":"")+(t.prof?" prof":"");
+ var l=(t.c-1)*U+(t.nv?32:0),w=t.w*U-8-(t.nv?32:0);
+ d.style.cssText="left:"+l+"px;top:"+(t.r-1)*U+"px;width:"+w+"px;height:"+(t.h*U-8)+"px;background:"+(t.art?"radial-gradient(circle at 70% 35%,rgba(255,255,255,.3),rgba(0,0,0,.6) 90%),":"")+t.bg;
  var h="";
- if(t.prof)h='<div class="av"></div><div class="pn">Mi TV</div><div class="pl">Samsung · Tizen</div><div class="pc"><b id="pclk"></b><span id="pcount">Mis apps</span></div>';
- else{if(t.art)h+='<div class="wm">'+(t.g||"")+'</div>';
+ if(t.prof)h='<div class="av"></div><div class="pn">Mi TV</div><div class="pl">Samsung · Tizen</div><div class="pc"><b class="pclk"></b><span class="pcount">Mis apps</span></div>';
+ else{if(t.art&&t.g)h+='<div class="wm">'+t.g+'</div>';
   else if(t.ic)h+='<div class="ic">'+IC[t.ic]+'</div>';else if(t.g)h+='<div class="ic">'+t.g+'</div>';
   h+=t.lab?'<div class="lab">'+t.n+'</div>':'<div class="n">'+t.n+'</div>'}
  d.innerHTML=h;return d}
-function build(p){page=p;var g=$("grid");g.innerHTML="";pitems=[];
- PAGES[p].forEach(function(t){var e=mkTile(t);g.appendChild(e);pitems.push({el:e,t:t})});
- $("nvl").textContent=p=="home"?"Acceso rápido":"";
- items=fixed.concat(pitems);tick();updCount();
- fixed.forEach(function(f){if(f.tab)f.el.classList.toggle("on",f.tab==p)})}
-function sel(i){items[cur]&&items[cur].el.classList.remove("sel");cur=i;var it=items[cur];it.el.classList.add("sel");
- if(it.tab&&it.tab!=page){build(it.tab);cur=items.indexOf(it);it.el.classList.add("sel")}}
+function buildPanel(p){var P=panelEl[p],old=tiles[p]||[];P.innerHTML="";var arr=[];
+ if(PANELS[p].label){var L=document.createElement("div");L.className="lbl";L.textContent=PANELS[p].label.t;L.style.cssText="left:"+PANELS[p].label.x+"px;top:"+PANELS[p].label.y+"px";P.appendChild(L)}
+ PANELS[p].tiles().forEach(function(t,i){var e=mkTile(t);P.appendChild(e);
+  arr.push({kind:"tile",p:p,i:i,el:e,t:t,cx:PX[p]+(t.c-1)*U+t.w*U/2,cy:(t.r-1)*U+t.h*U/2})});
+ tiles[p]=arr;tick();updCount();return arr}
+function goPanel(p){if(p==curPanel)return;curPanel=p;$("strip").style.webkitTransform=$("strip").style.transform="translateX("+(MARGIN-PX[p])+"px)";tabsOn()}
+function tabsOn(){tabs.forEach(function(t){t.el.className="tab"+(t.p==curPanel?" on":"")+(t==cur?" sel":"")})}
+function sel(it){if(cur)cur.el.classList.remove("sel");cur=it;it.el.classList.add("sel");if(it.kind!="top")goPanel(it.p);tabsOn()}
+function near(c,dx,dy){var best=null,bd=1e9,pool=[];
+ if(dx)tiles.forEach(function(a){pool=pool.concat(a)});else pool=tiles[c.p];
+ pool.forEach(function(it){if(it==c)return;var x=it.cx-c.cx,y=it.cy-c.cy,m=dx?x*dx:y*dy,o=dx?Math.abs(y):Math.abs(x);
+  if(m<=10)return;var d=m+o*2;if(d<bd){bd=d;best=it}});return best}
+function move(dx,dy){var c=cur,n=null;
+ if(c.kind=="top"){if(dx)n=tops[c.i+dx];else if(dy>0)n=tabs[curPanel]}
+ else if(c.kind=="tab"){if(dx)n=tabs[c.p+dx];else n=dy>0?tiles[c.p][0]:tops[0]}
+ else{n=near(c,dx,dy);if(!n&&dy<0)n=tabs[c.p]}
+ if(n)sel(n)}
 function act(it){var t=it.t;if(!t)return;
  if(t.act=="apps")openApps();else if(t.act=="exit")exitApp();
- else if(t.act&&t.act.indexOf("page:")==0){build(t.act.slice(5));sel(fixed.length)}
- else if(t.src)setSource(t.src);else launch(t.id)}
-function move(dx,dy){var a=items[cur].el.getBoundingClientRect(),ax=a.left+a.width/2,ay=a.top+a.height/2,best=-1,bd=1e9;
- items.forEach(function(it,i){if(i==cur)return;var b=it.el.getBoundingClientRect(),x=b.left+b.width/2-ax,y=b.top+b.height/2-ay;
-  var main=dx?x*dx:y*dy,off=dx?Math.abs(y):Math.abs(x);if(main<=10)return;var d=main+off*2;if(d<bd){bd=d;best=i}});
- if(best>=0)sel(best)}
-function init(){var T=$("top");
+ else if(t.act&&t.act.indexOf("panel:")==0)sel(tiles[+t.act.slice(6)][0]);
+ else{record(t.key);if(t.src)setSource(t.src);else launch(t.id)}}
+function init(){var x=MARGIN,T=$("top");PX=[];
  var lg=document.createElement("div");lg.className="sm";lg.style.background=G;lg.innerHTML=IC.globe;T.appendChild(lg);
- TOPBAR.forEach(function(k){var d=document.createElement("div");d.className="sm";d.style.background=TOPCOL[k];d.textContent=APPS[k].g||"▶";
-  T.appendChild(d);fixed.push({el:d,t:{id:APPS[k].id}})});
- TABS.forEach(function(x){var d=document.createElement("div");d.className="tab";d.textContent=x[1];$("tabs").appendChild(d);fixed.push({el:d,tab:x[0]})});
- build("home");sel(fixed.length)}
-function updCount(){var e=$("pcount");if(e&&apps.length)e.innerHTML=apps.length+" apps<br>instaladas"}
+ TOPBAR.forEach(function(k,i){var d=document.createElement("div");d.className="sm";d.style.background=TOPCOL[k];d.textContent=APPS[k].g||"▶";if(!APPS[k].g)d.innerHTML=IC.play;
+  T.appendChild(d);tops.push({kind:"top",i:i,el:d,t:{key:"a:"+k,id:APPS[k].id}})});
+ var px=0;PANELS.forEach(function(P,p){PX[p]=px;px+=P.cols*U-8+GAP;
+  var e=document.createElement("div");e.className="panel";e.style.cssText="left:"+PX[p]+"px;width:"+(P.cols*U-8)+"px";$("strip").appendChild(e);panelEl.push(e);
+  var d=document.createElement("div");d.className="tab";d.textContent=P.name;$("tabs").appendChild(d);tabs.push({kind:"tab",p:p,el:d})});
+ PANELS.forEach(function(P,p){buildPanel(p)});
+ $("strip").style.webkitTransform=$("strip").style.transform="translateX("+(MARGIN-PX[curPanel])+"px)";
+ sel(tiles[1][1])}
+function refreshHome(){var idx=cur&&cur.kind=="tile"&&cur.p==1,old=cur;buildPanel(1);if(idx)sel(tiles[1][1])}
+function updCount(){var a=document.getElementsByClassName("pcount");for(var i=0;i<a.length;i++)if(apps.length)a[i].innerHTML=apps.length+" apps<br>instaladas"}
 function loadApps(cb){try{tizen.application.getAppsInfo(function(a){apps=a.sort(function(x,y){return x.name.localeCompare(y.name)});updCount();cb&&cb()},function(e){cb&&cb(e.message)})}catch(e){cb&&cb("x")}}
 function openApps(){mode="apps";$("apps").style.display="block";$("list").innerHTML="Cargando…";
  loadApps(function(err){if(err&&!apps.length)apps=[{name:"(prueba en PC)",id:"sin.tizen"}];ai=0;draw()})}
@@ -149,10 +162,11 @@ document.addEventListener("keydown",function(e){var k=e.keyCode;
   else if(k==13&&apps[ai])launch(apps[ai].id);
   else{var m={37:-1,39:1,38:-3,40:3}[k];if(m){ai=Math.max(0,Math.min(apps.length-1,ai+m));draw()}}return}
  if(k==37)move(-1,0);else if(k==39)move(1,0);else if(k==38)move(0,-1);else if(k==40)move(0,1);
- else if(k==13){var it=items[cur];if(it.tab)sel(fixed.length);else act(it)}
- else if(k==10009||k==8){if(page!="home"){build("home");sel(fixed.length)}else exitApp()}});
-function tick(){var d=new Date(),h=d.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"});
+ else if(k==13){if(cur.kind=="tab")move(0,1);else if(cur.kind=="top"){record(cur.t.key);launch(cur.t.id)}else act(cur)}
+ else if(k==10009||k==8){if(curPanel!=1)sel(tiles[1][1]);else exitApp()}});
+document.addEventListener("visibilitychange",function(){if(!document.hidden)refreshHome()});
+function tick(){var d=new Date(),h=d.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"}),a=document.getElementsByClassName("pclk"),i;
  $("ring").textContent=h;$("dt").textContent=d.toLocaleDateString("es-CO",{weekday:"short",day:"numeric",month:"short"});
- var p=$("pclk");if(p)p.textContent=h}
+ for(i=0;i<a.length;i++)a[i].textContent=h}
 init();setInterval(tick,15000);loadApps();
 </script></body></html>
