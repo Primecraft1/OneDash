@@ -2,73 +2,157 @@
 <html lang="es"><head><meta charset="utf-8"><title>OneDash</title>
 <style>
 *{box-sizing:border-box;margin:0}
-html,body{width:1920px;height:1080px;overflow:hidden;background:#1c1c1c;color:#fff;font-family:"Segoe UI","Selawik","Open Sans",sans-serif}
-body:before{content:"";position:absolute;inset:0 0 auto 0;height:6px;background:#107c10}
-header{position:absolute;left:120px;right:120px;top:60px;display:flex;justify-content:space-between;align-items:baseline}
-h1{font-size:64px;font-weight:200;letter-spacing:-1px}
-#clock{font-size:36px;font-weight:300;color:#bbb}
-#grid{position:absolute;left:120px;top:210px;display:grid;grid-template-columns:repeat(6,248px);grid-auto-rows:248px;gap:8px}
-.tile{position:relative;padding:20px 24px;display:flex;flex-direction:column;justify-content:space-between;outline:0 solid #fff;transition:transform .12s}
-.tile .g{font-size:96px;font-weight:200;line-height:1}
-.tile.big .g{font-size:200px}
-.tile .n{font-size:28px;font-weight:400}
-.tile.big .n{font-size:40px}
-.tile.sel{transform:scale(1.04);outline:5px solid #fff;z-index:2}
-#hint{position:absolute;left:120px;bottom:50px;font-size:24px;color:#888}
-#apps{position:absolute;inset:0;background:#1c1c1ce8;display:none;padding:60px 120px}
+html,body{width:1920px;height:1080px;overflow:hidden;background:#101010;color:#fff;font-family:"Segoe UI","Selawik","Open Sans",sans-serif}
+.abs{position:absolute}
+#top{position:absolute;left:130px;top:44px;display:flex;gap:6px}
+.sm{width:64px;height:64px;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:300}
+.sm svg{width:40px;height:40px}
+#right{position:absolute;right:130px;top:40px;display:flex;align-items:center;gap:22px}
+#dt{font-size:20px;color:#107c10;letter-spacing:1px;text-transform:uppercase}
+#ring{width:76px;height:76px;border:5px solid #107c10;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:400}
+#tabs{position:absolute;left:130px;top:150px;display:flex;gap:44px}
+.tab{font-size:54px;font-weight:200;color:#6e6e6e;padding-bottom:4px;border-bottom:5px solid transparent}
+.tab.on{color:#fff}.tab.sel{border-bottom-color:#107c10}
+#grid{position:absolute;left:130px;top:300px;display:grid;grid-template-columns:repeat(8,200px);grid-auto-rows:200px;gap:8px}
+.tile{position:relative;overflow:hidden;background:#555}
+.tile.nv{margin-left:32px}
+.tile.sel,.sm.sel{outline:5px solid #fff;outline-offset:0;z-index:5}
+.tile.sel{transform:scale(1.03)}
+.ic{position:absolute;left:0;right:0;top:34px;text-align:center;font-size:84px;font-weight:200;line-height:92px}
+.ic svg{width:88px;height:88px}
+.n{position:absolute;left:16px;bottom:12px;font-size:22px}
+.lab{position:absolute;left:0;bottom:0;background:rgba(0,0,0,.72);padding:10px 22px;font-size:34px;font-weight:300}
+.wm{position:absolute;right:30px;top:-20px;font-size:380px;font-weight:700;opacity:.22;line-height:1}
+.prof{padding:14px 16px}
+.av{width:100px;height:100px;background:#e8432e;position:relative;margin-bottom:12px}
+.av:before,.av:after{content:"";position:absolute;top:34px;width:14px;height:14px;background:#fff}
+.av:before{left:26px}.av:after{right:26px}
+.pn{font-size:26px;font-weight:600}.pl{font-size:19px;color:#cfe8cf}
+.pc{position:absolute;left:16px;bottom:12px;font-size:20px;line-height:1.2}
+.pc b{display:block;font-size:48px;font-weight:300}
+#nvl{position:absolute;left:1410px;top:262px;font-size:19px;color:#aaa;letter-spacing:1px;text-transform:uppercase}
+.pk{position:absolute;pointer-events:none}
+#apps{position:absolute;inset:0;background:#101010f2;display:none;padding:60px 130px;z-index:20}
 #apps h2{font-size:48px;font-weight:200;margin-bottom:24px}
 #list{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 12px;height:820px;overflow:hidden;align-content:start}
 .it{padding:14px 20px;background:#2d2d2d;font-size:28px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.it small{display:block;font-size:18px;color:#999}
-.it.sel{background:#107c10}
-#toast{position:absolute;right:120px;bottom:50px;background:#c50f1f;padding:14px 22px;font-size:24px;display:none}
+.it small{display:block;font-size:18px;color:#999}.it.sel{background:#107c10}
+#toast{position:absolute;right:130px;bottom:40px;max-width:900px;background:#c50f1f;padding:14px 22px;font-size:24px;display:none;z-index:30}
 </style></head><body>
-<header><h1>Inicio</h1><div id="clock"></div></header>
+<div id="top"></div>
+<div id="right"><div id="dt"></div><div id="ring"></div></div>
+<div id="tabs"></div>
+<div id="nvl"></div>
 <div id="grid"></div>
-<div id="hint">Flechas: mover · OK: abrir · Atrás: salir</div>
-<div id="apps"><h2>Mis apps — el ID aparece bajo cada nombre</h2><div id="list"></div></div>
+<div class="pk" style="left:0;top:300px;width:96px;height:616px;background:linear-gradient(#0e7a0d 0 200px,transparent 200px 208px,#0e7a0d 208px 408px,transparent 408px 416px,#0e7a0d 416px)"></div>
+<div class="pk" style="left:1836px;top:300px;width:84px;height:408px;background:linear-gradient(#2a2a2a 0 200px,transparent 200px 208px,#3b2a14 208px)"></div>
+<div id="apps"><h2>Mis apps (el ID aparece bajo cada nombre)</h2><div id="list"></div></div>
 <div id="toast"></div>
 <script>
 // ===== CONFIGURA AQUÍ =====
-// c,r = columna,fila (desde 1); w,h = ancho,alto en celdas
-// id = ID de la app en el TV (usa "Mis apps" para ver los IDs reales de tu equipo)
-var TILES=[
- {n:"Netflix",g:"N",id:"11101200001",c:1,r:1,w:2,h:2,bg:"#b20710"},
- {n:"YouTube",g:"▶",id:"111299001912",c:3,r:1,w:2,h:1,bg:"#c4302b"},
- {n:"Prime Video",g:"P",id:"3201512006785",c:5,r:1,w:1,h:1,bg:"#00a8e1"},
- {n:"Spotify",g:"S",id:"3201606009684",c:3,r:2,w:1,h:1,bg:"#1db954"},
- {n:"Disney+",g:"D",id:"3201901017640",c:4,r:2,w:1,h:1,bg:"#113ccf"},
- {n:"Plex",g:"X",id:"3201512006963",c:5,r:2,w:1,h:1,bg:"#e5a00d"},
- {n:"Mis apps",g:"▦",act:"apps",c:1,r:3,w:2,h:1,bg:"#107c10"},
- {n:"Salir",g:"✕",act:"exit",c:3,r:3,w:1,h:1,bg:"#444"}
-];
+// IDs de apps: abre "Mis apps" en el TV para ver los reales.
+var APPS={
+ netflix:{n:"Netflix",id:"11101200001",g:"N",bg:"#b20710"},
+ youtube:{n:"YouTube",id:"111299001912",ic:"play",bg:"#4a4a4a"},
+ prime:{n:"Prime Video",id:"3201512006785",g:"P",bg:"#00a2e8"},
+ spotify:{n:"Spotify",id:"3201606009684",g:"S",bg:"linear-gradient(135deg,#1db954,#0a3d1c)"},
+ disney:{n:"Disney+",id:"3201901017640",g:"D+",bg:"#1b44c8"},
+ plex:{n:"Plex",id:"3201512006963",g:"X",bg:"linear-gradient(135deg,#e5a00d,#4a3205)"}
+};
+// Entradas de video. Cambiar de fuente desde una app suele estar bloqueado
+// en TVs Samsung de 2017; si "id" tiene un ID de app válido, se usa como alternativa.
+var SRC={
+ h1:{n:"HDMI 1",type:"HDMI",num:1,id:""},h2:{n:"HDMI 2",type:"HDMI",num:2,id:""},
+ h3:{n:"HDMI 3",type:"HDMI",num:3,id:""},av:{n:"AV / Componente",type:"COMPONENT",num:1,id:""},
+ tv:{n:"TV en vivo",type:"TV",num:1,id:""},menu:{n:"Menú de fuentes",type:"",num:0,id:"",menu:1}
+};
+var MENU_SOURCE_ID=""; // ID de la app de fuentes del TV si la encuentras en "Mis apps"
+var TOPBAR=["netflix","youtube","prime","spotify","disney","plex"];
+var TOPCOL={netflix:"#e8432e",youtube:"#c4302b",prime:"#00a2e8",spotify:"#1db954",disney:"#1b44c8",plex:"#e5a00d"};
 // ==========================
-var $=function(i){return document.getElementById(i)},grid=$("grid"),els=[],cur=0,mode="home",apps=[],ai=0;
-function toast(t){var e=$("toast");e.textContent=t;e.style.display="block";setTimeout(function(){e.style.display="none"},3500)}
-function launch(id){try{tizen.application.launch(id,null,function(e){toast("No se pudo abrir: "+e.message)})}catch(e){toast("Solo funciona dentro del TV ("+id+")")}}
+var IC={
+ monitor:'<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3"><path d="M6 10h36v22H6zM16 41h16M24 32v9"/></svg>',
+ grid:'<svg viewBox="0 0 48 48" fill="#fff"><path d="M6 6h16v16H6zM26 6h16v16H26zM6 26h16v16H6zM26 26h16v16H26z"/></svg>',
+ play:'<svg viewBox="0 0 48 48" fill="#fff"><path d="M14 8l26 16-26 16z"/></svg>',
+ hdmi:'<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3"><path d="M6 14h36v12l-6 10H12L6 26zM16 20h16"/></svg>',
+ tv:'<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3"><path d="M6 16h36v24H6zM16 6l8 10 8-10"/></svg>',
+ av:'<svg viewBox="0 0 48 48" fill="#fff"><circle cx="12" cy="24" r="6"/><circle cx="24" cy="24" r="6"/><circle cx="36" cy="24" r="6"/></svg>',
+ power:'<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3.5"><path d="M24 6v18M14 13a16 16 0 1 0 20 0"/></svg>',
+ globe:'<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3"><circle cx="24" cy="24" r="17"/><path d="M7 24h34M24 7c-9 9-9 25 0 34M24 7c9 9 9 25 0 34"/></svg>'
+};
+var $=function(i){return document.getElementById(i)},apps=[],ai=0,mode="home",page="home",cur=0,fixed=[],pitems=[],items=[];
+function toast(t){var e=$("toast");e.textContent=t;e.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(function(){e.style.display="none"},4500)}
+function launch(id){if(!id){toast("Este mosaico no tiene ID de app. Edita index.html.");return}
+ try{tizen.application.launch(id,null,function(e){toast("No se pudo abrir: "+e.message)})}catch(e){toast("Solo funciona dentro del TV ("+id+")")}}
 function exitApp(){try{tizen.application.getCurrentApplication().exit()}catch(e){}}
-TILES.forEach(function(t,i){var d=document.createElement("div");d.className="tile"+(t.w*t.h>2?" big":"");
- d.style.cssText="grid-column:"+t.c+"/span "+t.w+";grid-row:"+t.r+"/span "+t.h+";background:"+t.bg;
- d.innerHTML='<div class="g">'+t.g+'</div><div class="n">'+t.n+'</div>';grid.appendChild(d);els.push(d)});
-function sel(i){els[cur].classList.remove("sel");cur=i;els[cur].classList.add("sel")}
-function move(dx,dy){var a=els[cur].getBoundingClientRect(),ax=a.left+a.width/2,ay=a.top+a.height/2,best=-1,bd=1e9;
- els.forEach(function(e,i){if(i==cur)return;var b=e.getBoundingClientRect(),x=b.left+b.width/2-ax,y=b.top+b.height/2-ay;
+function setSource(s){
+ if(s.menu&&MENU_SOURCE_ID){launch(MENU_SOURCE_ID);return}
+ try{tizen.tvwindow.setSource({type:s.type,number:s.num},function(){},function(e){fallback(s,e.message)},"MAIN")}
+ catch(e){fallback(s,"")}}
+function fallback(s,m){var id=s.menu?MENU_SOURCE_ID:s.id;
+ if(id)launch(id);else toast("Este TV no deja cambiar de fuente desde apps. Usa el botón SOURCE del control. "+(m||""))}
+function appTile(k,o){var a=APPS[k],t={n:a.n,id:a.id,bg:a.bg,g:a.g,ic:a.ic};for(var x in o)t[x]=o[x];return t}
+function srcTile(k,o){var s=SRC[k],t={n:s.n,src:s,ic:k=="av"?"av":k=="tv"?"tv":k=="menu"?"monitor":"hdmi",bg:"#555"};for(var x in o)t[x]=o[x];return t}
+var G="#0e7a0d";
+var PAGES={
+ pins:[appTile("netflix",{c:1,r:1,w:2,h:2,lab:1,art:1}),appTile("youtube",{c:3,r:1,w:2,h:1}),appTile("prime",{c:5,r:1,w:1,h:1}),
+  appTile("spotify",{c:3,r:2,w:1,h:1}),appTile("disney",{c:4,r:2,w:1,h:1}),appTile("plex",{c:5,r:2,w:1,h:1}),
+  {n:"Mis apps",ic:"grid",act:"apps",bg:G,c:1,r:3,w:2,h:1},{n:"Salir",ic:"power",act:"exit",bg:"#444",c:3,r:3,w:1,h:1}],
+ home:[{prof:1,act:"apps",bg:G,c:1,r:1,w:1,h:3},
+  appTile("netflix",{c:2,r:1,w:4,h:2,lab:1,art:1}),
+  {n:"Fuentes",ic:"monitor",act:"page:fuentes",bg:G,c:6,r:1,w:1,h:1},
+  {n:"Mis apps",ic:"grid",act:"apps",bg:G,c:6,r:2,w:1,h:1},
+  appTile("youtube",{c:2,r:3}),appTile("prime",{c:3,r:3}),appTile("spotify",{c:4,r:3}),appTile("disney",{c:5,r:3}),
+  {n:"Salir",ic:"power",act:"exit",bg:G,c:6,r:3,w:1,h:1},
+  srcTile("h1",{c:7,r:1,w:2,h:1,cls:"nv"}),srcTile("h2",{c:7,r:2,w:2,h:1,cls:"nv"}),appTile("plex",{c:7,r:3,w:2,h:1,cls:"nv"})],
+ fuentes:[srcTile("h1",{c:1,r:1,w:2,h:2,bg:"linear-gradient(135deg,#2b3a55,#0d1320)"}),srcTile("h2",{c:3,r:1,w:2,h:1,bg:"#1b44c8"}),
+  srcTile("h3",{c:5,r:1}),srcTile("av",{c:3,r:2}),srcTile("tv",{c:4,r:2,bg:G}),srcTile("menu",{c:5,r:2,bg:G})]
+};
+var TABS=[["pins","Favoritos"],["home","Inicio"],["fuentes","Fuentes"]];
+function mkTile(t){var d=document.createElement("div");d.className="tile"+(t.prof?" prof":"")+(t.cls?" "+t.cls:"");
+ d.style.cssText="grid-column:"+t.c+"/span "+t.w+";grid-row:"+t.r+"/span "+t.h+";background:"+(t.art&&t.bg=="#b20710"?"radial-gradient(circle at 70% 35%,#e5484d,#7a0b11 40%,#1a0507 90%)":t.bg);
+ var h="";
+ if(t.prof)h='<div class="av"></div><div class="pn">Mi TV</div><div class="pl">Samsung · Tizen</div><div class="pc"><b id="pclk"></b><span id="pcount">Mis apps</span></div>';
+ else{if(t.art)h+='<div class="wm">'+(t.g||"")+'</div>';
+  else if(t.ic)h+='<div class="ic">'+IC[t.ic]+'</div>';else if(t.g)h+='<div class="ic">'+t.g+'</div>';
+  h+=t.lab?'<div class="lab">'+t.n+'</div>':'<div class="n">'+t.n+'</div>'}
+ d.innerHTML=h;return d}
+function build(p){page=p;var g=$("grid");g.innerHTML="";pitems=[];
+ PAGES[p].forEach(function(t){var e=mkTile(t);g.appendChild(e);pitems.push({el:e,t:t})});
+ $("nvl").textContent=p=="home"?"Acceso rápido":"";
+ items=fixed.concat(pitems);tick();updCount();
+ fixed.forEach(function(f){if(f.tab)f.el.classList.toggle("on",f.tab==p)})}
+function sel(i){items[cur]&&items[cur].el.classList.remove("sel");cur=i;var it=items[cur];it.el.classList.add("sel");
+ if(it.tab&&it.tab!=page){build(it.tab);cur=items.indexOf(it);it.el.classList.add("sel")}}
+function act(it){var t=it.t;if(!t)return;
+ if(t.act=="apps")openApps();else if(t.act=="exit")exitApp();
+ else if(t.act&&t.act.indexOf("page:")==0){build(t.act.slice(5));sel(fixed.length)}
+ else if(t.src)setSource(t.src);else launch(t.id)}
+function move(dx,dy){var a=items[cur].el.getBoundingClientRect(),ax=a.left+a.width/2,ay=a.top+a.height/2,best=-1,bd=1e9;
+ items.forEach(function(it,i){if(i==cur)return;var b=it.el.getBoundingClientRect(),x=b.left+b.width/2-ax,y=b.top+b.height/2-ay;
   var main=dx?x*dx:y*dy,off=dx?Math.abs(y):Math.abs(x);if(main<=10)return;var d=main+off*2;if(d<bd){bd=d;best=i}});
  if(best>=0)sel(best)}
-function openApps(){mode="apps";$("apps").style.display="block";var L=$("list");L.innerHTML="Cargando…";
- try{tizen.application.getAppsInfo(function(a){apps=a.sort(function(x,y){return x.name.localeCompare(y.name)});ai=0;draw()},function(e){L.textContent="Error: "+e.message})}
- catch(e){apps=[{name:"(prueba en PC)",id:"sin.tizen"}];ai=0;draw()}}
+function init(){var T=$("top");
+ var lg=document.createElement("div");lg.className="sm";lg.style.background=G;lg.innerHTML=IC.globe;T.appendChild(lg);
+ TOPBAR.forEach(function(k){var d=document.createElement("div");d.className="sm";d.style.background=TOPCOL[k];d.textContent=APPS[k].g||"▶";
+  T.appendChild(d);fixed.push({el:d,t:{id:APPS[k].id}})});
+ TABS.forEach(function(x){var d=document.createElement("div");d.className="tab";d.textContent=x[1];$("tabs").appendChild(d);fixed.push({el:d,tab:x[0]})});
+ build("home");sel(fixed.length)}
+function updCount(){var e=$("pcount");if(e&&apps.length)e.innerHTML=apps.length+" apps<br>instaladas"}
+function loadApps(cb){try{tizen.application.getAppsInfo(function(a){apps=a.sort(function(x,y){return x.name.localeCompare(y.name)});updCount();cb&&cb()},function(e){cb&&cb(e.message)})}catch(e){cb&&cb("x")}}
+function openApps(){mode="apps";$("apps").style.display="block";$("list").innerHTML="Cargando…";
+ loadApps(function(err){if(err&&!apps.length)apps=[{name:"(prueba en PC)",id:"sin.tizen"}];ai=0;draw()})}
 function draw(){var L=$("list");L.innerHTML="";apps.forEach(function(a,i){var d=document.createElement("div");d.className="it"+(i==ai?" sel":"");
  d.innerHTML=a.name+"<small>"+a.id+"</small>";L.appendChild(d)});var s=L.children[ai];if(s)L.scrollTop=Math.max(0,s.offsetTop-L.offsetTop-300)}
-function closeApps(){mode="home";$("apps").style.display="none"}
 document.addEventListener("keydown",function(e){var k=e.keyCode;
- if(mode=="apps"){if(k==10009||k==8)closeApps();
+ if(mode=="apps"){if(k==10009||k==8){mode="home";$("apps").style.display="none"}
   else if(k==13&&apps[ai])launch(apps[ai].id);
   else{var m={37:-1,39:1,38:-3,40:3}[k];if(m){ai=Math.max(0,Math.min(apps.length-1,ai+m));draw()}}return}
  if(k==37)move(-1,0);else if(k==39)move(1,0);else if(k==38)move(0,-1);else if(k==40)move(0,1);
- else if(k==13){var t=TILES[cur];t.act=="apps"?openApps():t.act=="exit"?exitApp():launch(t.id)}
- else if(k==10009||k==8)exitApp()});
-try{tizen.tvinputdevice.registerKey("MediaPlay")}catch(e){}
-function tick(){var d=new Date();$("clock").textContent=d.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"})}
-tick();setInterval(tick,15000);sel(0);
+ else if(k==13){var it=items[cur];if(it.tab)sel(fixed.length);else act(it)}
+ else if(k==10009||k==8){if(page!="home"){build("home");sel(fixed.length)}else exitApp()}});
+function tick(){var d=new Date(),h=d.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"});
+ $("ring").textContent=h;$("dt").textContent=d.toLocaleDateString("es-CO",{weekday:"short",day:"numeric",month:"short"});
+ var p=$("pclk");if(p)p.textContent=h}
+init();setInterval(tick,15000);loadApps();
 </script></body></html>
