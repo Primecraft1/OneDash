@@ -6,44 +6,47 @@ html,body{width:1920px;height:1080px;overflow:hidden;background:transparent;colo
 #top{position:absolute;left:130px;top:40px;height:76px}
 #ava{position:absolute;left:0;top:0;width:76px;height:76px;border-radius:50%;background:#0e7a0d center/cover no-repeat;display:flex;align-items:center;justify-content:center}
 #ava svg{width:46px;height:46px}
-#who{position:absolute;left:98px;top:2px;white-space:nowrap}
-#clk{font-size:38px;font-weight:300;line-height:42px}
-#dt{font-size:20px;color:#9bd29b;text-transform:uppercase;letter-spacing:1px}
+#foot{position:absolute;right:130px;bottom:48px;display:flex;align-items:baseline}
+#dt{font-size:22px;color:#9a9a9a;text-transform:uppercase;letter-spacing:1px;margin-right:26px}
+#clk{font-size:40px;font-weight:300}
 #right{position:absolute;right:130px;top:40px;width:76px;height:76px}
 #right svg{width:76px;height:76px}
 #tabs{position:absolute;left:130px;top:150px;display:flex}
-.tab{font-size:54px;font-weight:200;color:#6e6e6e;padding-bottom:4px;margin-right:44px;border-bottom:5px solid transparent}
-.tab.on{color:#fff}.tab.sel{border-bottom-color:#107c10}
+.tab{font-size:54px;font-weight:200;color:#6e6e6e;margin-right:44px}
+.tab.on{color:#b5b5b5}.tab.sel{color:#fff}
 #view{position:absolute;left:0;top:240px;width:1920px;height:780px;overflow:hidden}
 #strip{position:absolute;left:0;top:60px;width:4400px;height:700px;transition:transform .55s cubic-bezier(.22,.8,.2,1)}
 .panel{position:absolute;top:0;height:700px}
 .tile{position:absolute;overflow:hidden;background:#555}
-#focus{position:absolute;display:none;border:6px solid #fff;box-sizing:border-box;box-shadow:0 14px 44px 6px rgba(0,0,0,.95);z-index:10;pointer-events:none}
+#focus,.ghost{position:absolute;border:6px solid #fff;box-sizing:border-box;box-shadow:0 14px 44px 6px rgba(0,0,0,.95);z-index:10;pointer-events:none}
+#focus{display:none}.ghost{z-index:9}
 .tile.live{background:transparent!important}.tile.live .ic{display:none}
-.bgf{position:absolute;background:#232323;z-index:-1}
+.bgf{position:absolute;background:#000;z-index:-1}
 .tag{position:absolute;left:16px;top:14px;padding:2px 12px;font-size:22px;font-weight:600}
-.ic{position:absolute;left:0;right:0;top:34px;text-align:center;font-size:84px;font-weight:200;line-height:92px}
-.ic svg{width:88px;height:88px}
-.big .ic{top:62px}.big .ic svg{width:150px;height:150px}
-.n{position:absolute;left:16px;bottom:12px;font-size:22px}
-.lab{position:absolute;left:0;bottom:0;max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;background:rgba(0,0,0,.72);padding:10px 22px;font-size:34px;font-weight:300}
-.wm{position:absolute;right:30px;top:-20px;font-size:380px;font-weight:700;opacity:.22;line-height:1}
+.ic{position:absolute;left:0;right:0;top:28px;text-align:center;font-size:70px;font-weight:200;line-height:78px}
+.ic svg{width:74px;height:74px}
+.big .ic{top:52px}.big .ic svg{width:124px;height:124px}
+.lab{position:absolute;left:0;bottom:0;max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;background:rgba(0,0,0,.72);padding:8px 16px;font-size:24px;font-weight:300;transform:translateY(100%);transition:transform .16s ease-out}
+.big .lab{font-size:30px;padding:10px 20px}
+.tile.sel .lab{transform:translateY(0)}
+.wm{position:absolute;right:30px;top:-20px;font-size:320px;font-weight:700;opacity:.22;line-height:1}
 .prof{padding:14px 16px}
-.av{width:100px;height:100px;background:#e8432e;position:relative;margin-bottom:12px}
-.av:before,.av:after{content:"";position:absolute;top:34px;width:14px;height:14px;background:#fff}
-.av:before{left:26px}.av:after{right:26px}
-.pn{font-size:26px;font-weight:600}.pl{font-size:19px;color:#cfe8cf}
-.pc{position:absolute;left:16px;bottom:12px;font-size:20px;line-height:1.2}
-.pc b{display:block;font-size:48px;font-weight:300}
+.av{width:84px;height:84px;background:#e8432e;position:relative;margin-bottom:12px}
+.av:before,.av:after{content:"";position:absolute;top:28px;width:12px;height:12px;background:#fff}
+.av:before{left:22px}.av:after{right:22px}
+.pn{font-size:22px;font-weight:600}.pl{font-size:16px;color:#cfe8cf}
+.pc{position:absolute;left:16px;bottom:12px;font-size:17px;line-height:1.2}
+.pc b{display:block;font-size:40px;font-weight:300}
 .lbl{position:absolute;font-size:19px;color:#aaa;letter-spacing:1px;text-transform:uppercase}
-#apps{position:absolute;left:0;top:0;right:0;bottom:0;background:#101010f2;display:none;padding:60px 130px;z-index:20}
+#apps{position:absolute;left:0;top:0;right:0;bottom:0;background:#000000f2;display:none;padding:60px 130px;z-index:20}
 #apps h2{font-size:48px;font-weight:200;margin-bottom:24px}
 #list{height:820px;overflow:hidden}
 .it{display:inline-block;vertical-align:top;width:32.5%;margin:0 .6% 8px 0;padding:14px 20px;background:#2d2d2d;font-size:28px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .it small{display:block;font-size:18px;color:#999}.it.sel{background:#107c10}
 #toast{position:absolute;right:130px;bottom:40px;max-width:900px;background:#c50f1f;padding:14px 22px;font-size:24px;display:none;z-index:30}
 </style></head><body>
-<div id="top"><div id="ava"></div><div id="who"><div id="clk"></div><div id="dt"></div></div></div>
+<div id="top"><div id="ava"></div></div>
+<div id="foot"><div id="dt"></div><div id="clk"></div></div>
 <div id="right"></div>
 <div id="tabs"></div>
 <div id="view"><div id="strip"></div></div>
@@ -68,6 +71,8 @@ var SRC={
  tv:{n:"TV por aire",type:"TV",num:1,id:""}
 };
 var SETTINGS_ID=""; // ID de la app de Ajustes del TV (búscala en "Mis apps")
+var BROWSER_ID="org.tizen.browser"; // navegador del TV (verifica el ID en "Mis apps")
+var STORE_ID="";                    // app de tienda de apps de Samsung (búscala en "Mis apps")
 var AVATAR="";      // ruta de una imagen dentro del proyecto, ej. "avatar.png"; vacío = icono genérico
 // Banners de la derecha. Netflix y Prime no tienen API pública: puedes poner tu propia imagen (img) y texto.
 // YouTube puede mostrar el video en tendencia si pones una API key gratuita de YouTube Data API v3.
@@ -90,12 +95,13 @@ var IC={
  user:'<svg viewBox="0 0 48 48" fill="#fff"><circle cx="24" cy="17" r="9"/><path d="M6 44c0-11 8-16 18-16s18 5 18 16z"/></svg>',
  gear:'<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3"><circle cx="24" cy="24" r="8"/><circle cx="24" cy="24" r="16" stroke-width="7" stroke-dasharray="6.28 6.28"/></svg>',
  rca:'<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3"><circle cx="24" cy="24" r="14"/><circle cx="24" cy="24" r="5" fill="#fff"/></svg>',
+ store:'<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3"><path d="M10 16h28l-2 26H12zM17 16v-3a7 7 0 0 1 14 0v3"/></svg>',
  globe:'<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3"><circle cx="24" cy="24" r="17"/><path d="M7 24h34M24 7c-9 9-9 25 0 34M24 7c9 9 9 25 0 34"/></svg>'
 };
-var U=208,G="#0e7a0d",MARGIN=130,GAP=48;
+var U=176,G="#0e7a0d",MARGIN=130,GAP=48;
 var $=function(i){return document.getElementById(i)},apps=[],ai=0,mode="home";
 function toast(t){var e=$("toast");e.textContent=t;e.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(function(){e.style.display="none"},4500)}
-function launch(id){if(!id){toast("Este mosaico no tiene ID de app. Edita index.html.");return}
+function launch(id){if(!id){toast("Falta el ID de esta app: búscalo en Mis apps y ponlo en index.html.");return}
  try{tizen.application.launch(id,null,function(e){toast("No se pudo abrir: "+e.message)})}catch(e){toast("Solo funciona dentro del TV ("+id+")")}}
 function exitApp(){try{tizen.application.getCurrentApplication().exit()}catch(e){}}
 function setSource(s){
@@ -121,7 +127,8 @@ var PANELS=[
   appTile("spotify",{c:4,r:1}),appTile("disney",{c:5,r:1}),appTile("plex",{c:6,r:1})]}},
  {name:"Inicio",cols:8,tiles:homeTiles,label:{t:"Novedades",x:6*U+32,y:-38}},
  {name:"Fuentes",cols:6,tiles:function(){return[srcTile("h1",{c:1,r:1}),srcTile("h2",{c:2,r:1}),srcTile("h3",{c:3,r:1}),srcTile("cp",{c:4,r:1}),srcTile("av",{c:5,r:1}),srcTile("tv",{c:6,r:1}),
-  {n:"Ajustes",ic:"gear",act:"settings",bg:G,c:1,r:2},{n:"Mis apps",ic:"grid",act:"apps",bg:G,c:2,r:2},{n:"Salir",ic:"power",act:"exit",bg:G,c:3,r:2}]}}
+  {n:"Ajustes",ic:"gear",act:"settings",bg:G,c:1,r:2},{n:"Navegador",ic:"globe",id:BROWSER_ID,bg:G,c:2,r:2},{n:"Tienda de apps",ic:"store",id:STORE_ID,bg:G,c:3,r:2},
+  {n:"Mis apps",ic:"grid",act:"apps",bg:G,c:4,r:2},{n:"Salir",ic:"power",act:"exit",bg:G,c:5,r:2}]}}
 ];
 var PX=[],tiles=[],tabs=[],tops=[],panelEl=[],curPanel=1,cur=null;
 function mkTile(t){var d=document.createElement("div");d.className="tile"+(t.w*t.h>=4?" big":"")+(t.prof?" prof":"");
@@ -134,7 +141,7 @@ function mkTile(t){var d=document.createElement("div");d.className="tile"+(t.w*t
  else if(t.banner)h='<div class="tag" style="background:'+t.color+'">'+t.tag+'</div><div class="lab">'+t.n+'</div>';
  else{if(t.art&&t.g)h+='<div class="wm">'+t.g+'</div>';
   else if(t.ic)h+='<div class="ic">'+IC[t.ic]+'</div>';else if(t.g)h+='<div class="ic">'+t.g+'</div>';
-  h+=t.lab?'<div class="lab">'+t.n+'</div>':'<div class="n">'+t.n+'</div>'}
+  h+='<div class="lab">'+t.n+'</div>'}
  d.innerHTML=h;return d}
 function buildPanel(p){var P=panelEl[p],old=tiles[p]||[];P.innerHTML="";var arr=[];
  if(PANELS[p].label){var L=document.createElement("div");L.className="lbl";L.textContent=PANELS[p].label.t;L.style.cssText="left:"+PANELS[p].label.x+"px;top:"+PANELS[p].label.y+"px";P.appendChild(L)}
@@ -143,10 +150,13 @@ function buildPanel(p){var P=panelEl[p],old=tiles[p]||[];P.innerHTML="";var arr=
  tiles[p]=arr;tick();updCount();return arr}
 function goPanel(p){if(p==curPanel)return;curPanel=p;$("strip").style.webkitTransform=$("strip").style.transform="translateX("+(MARGIN-PX[p])+"px)";tabsOn()}
 function tabsOn(){tabs.forEach(function(t){t.el.className="tab"+(t.p==curPanel?" on":"")+(t==cur?" sel":"")})}
-function placeFocus(it){var f=$("focus");if(it.kind!="tile"){f.style.display="none";return}
+function placeFocus(it){var f=$("focus");
+ if(f.style.display=="block"){var g=f.cloneNode(false);g.removeAttribute("id");g.className="ghost";g.style.opacity=1;g.style.transition="opacity .25s";$("strip").appendChild(g);g.offsetWidth;g.style.opacity=0;
+  setTimeout(function(){if(g.parentNode)g.parentNode.removeChild(g)},300)}
+if(it.kind!="tile"){f.style.display="none";return}
  var t=it.t,l=(t.c-1)*U+(t.nv?32:0),w=t.w*U-8-(t.nv?32:0);
  f.style.display="block";f.style.left=(PX[it.p]+l-10)+"px";f.style.top=((t.r-1)*U-10)+"px";f.style.width=(w+20)+"px";f.style.height=(t.h*U-8+20)+"px"}
-function sel(it){cur=it;if(it.kind!="top")goPanel(it.p);tabsOn();placeFocus(it);updatePreview()}
+function sel(it){if(cur&&cur.el)cur.el.classList.remove("sel");cur=it;it.el.classList.add("sel");if(it.kind!="top")goPanel(it.p);tabsOn();placeFocus(it);updatePreview()}
 function near(c,dx,dy){var best=null,bd=1e9,pool=[];
  if(dx)tiles.forEach(function(a){pool=pool.concat(a)});else pool=tiles[c.p];
  pool.forEach(function(it){if(it==c)return;var x=it.cx-c.cx,y=it.cy-c.cy,m=dx?x*dx:y*dy,o=dx?Math.abs(y):Math.abs(x);
@@ -188,7 +198,7 @@ function tick(){var d=new Date(),h=d.toLocaleTimeString("es-CO",{hour:"2-digit",
  $("clk").textContent=h;$("dt").textContent=d.toLocaleDateString("es-CO",{weekday:"short",day:"numeric",month:"short"});
  for(i=0;i<a.length;i++)a[i].textContent=h}
 var bgs=[];
-function mkBg(){if(typeof tizen==="undefined")document.documentElement.style.background="#232323";
+function mkBg(){if(typeof tizen==="undefined")document.documentElement.style.background="#000";
  for(var i=0;i<4;i++){var d=document.createElement("div");d.className="bgf";document.body.insertBefore(d,document.body.firstChild);bgs.push(d)}setHole(null)}
 function box(d,x,y,w,h){d.style.left=x+"px";d.style.top=y+"px";d.style.width=w+"px";d.style.height=h+"px"}
 function setHole(r){if(!r){box(bgs[0],0,0,1920,1080);box(bgs[1],0,0,0,0);box(bgs[2],0,0,0,0);box(bgs[3],0,0,0,0);return}
