@@ -14,13 +14,13 @@ html,body{width:1920px;height:1080px;overflow:hidden;background:transparent;colo
 #tabs{position:absolute;left:130px;top:150px;display:flex}
 .tab{font-size:54px;font-weight:200;color:#6e6e6e;padding-bottom:4px;margin-right:44px;border-bottom:5px solid transparent}
 .tab.on{color:#fff}.tab.sel{border-bottom-color:#107c10}
-#view{position:absolute;left:0;top:280px;width:1920px;height:740px;overflow:hidden}
-#strip{position:absolute;left:0;top:20px;width:4400px;height:700px;transition:transform .55s cubic-bezier(.22,.8,.2,1)}
+#view{position:absolute;left:0;top:240px;width:1920px;height:780px;overflow:hidden}
+#strip{position:absolute;left:0;top:60px;width:4400px;height:700px;transition:transform .55s cubic-bezier(.22,.8,.2,1)}
 .panel{position:absolute;top:0;height:700px}
 .tile{position:absolute;overflow:hidden;background:#555}
-#focus{position:absolute;display:none;border:6px solid #fff;box-sizing:border-box;box-shadow:0 12px 40px rgba(0,0,0,.9);z-index:10;pointer-events:none;transition:left .14s,top .14s,width .14s,height .14s}
+#focus{position:absolute;display:none;border:6px solid #fff;box-sizing:border-box;box-shadow:0 14px 44px 6px rgba(0,0,0,.95);z-index:10;pointer-events:none}
 .tile.live{background:transparent!important}.tile.live .ic{display:none}
-.bgf{position:absolute;background:#101010;z-index:-1}
+.bgf{position:absolute;background:#232323;z-index:-1}
 .tag{position:absolute;left:16px;top:14px;padding:2px 12px;font-size:22px;font-weight:600}
 .ic{position:absolute;left:0;right:0;top:34px;text-align:center;font-size:84px;font-weight:200;line-height:92px}
 .ic svg{width:88px;height:88px}
@@ -127,7 +127,7 @@ var PX=[],tiles=[],tabs=[],tops=[],panelEl=[],curPanel=1,cur=null;
 function mkTile(t){var d=document.createElement("div");d.className="tile"+(t.w*t.h>=4?" big":"")+(t.prof?" prof":"");
  var l=(t.c-1)*U+(t.nv?32:0),w=t.w*U-8-(t.nv?32:0),bg;
  if(t.banner)bg=t.img?"linear-gradient(to top,rgba(0,0,0,.7),rgba(0,0,0,.05)),url("+t.img+") center/cover,"+t.color:"linear-gradient(135deg,"+t.color+",#151515)";
- else bg=(t.art?"radial-gradient(circle at 70% 35%,rgba(255,255,255,.3),rgba(0,0,0,.6) 90%),":"")+t.bg;
+ else bg=(t.art&&!t.src?"radial-gradient(circle at 70% 35%,rgba(255,255,255,.3),rgba(0,0,0,.6) 90%),":"")+t.bg;
  d.style.cssText="left:"+l+"px;top:"+(t.r-1)*U+"px;width:"+w+"px;height:"+(t.h*U-8)+"px;background:"+bg;
  var h="";
  if(t.prof)h='<div class="av"></div><div class="pn">Mi TV</div><div class="pl">Samsung · Tizen</div><div class="pc"><b class="pclk"></b><span class="pcount">Mis apps</span></div>';
@@ -138,7 +138,7 @@ function mkTile(t){var d=document.createElement("div");d.className="tile"+(t.w*t
  d.innerHTML=h;return d}
 function buildPanel(p){var P=panelEl[p],old=tiles[p]||[];P.innerHTML="";var arr=[];
  if(PANELS[p].label){var L=document.createElement("div");L.className="lbl";L.textContent=PANELS[p].label.t;L.style.cssText="left:"+PANELS[p].label.x+"px;top:"+PANELS[p].label.y+"px";P.appendChild(L)}
- PANELS[p].tiles().forEach(function(t,i){var e=mkTile(t);P.appendChild(e);
+ PANELS[p].tiles().forEach(function(t,i){t.w=t.w||1;t.h=t.h||1;var e=mkTile(t);P.appendChild(e);
   arr.push({kind:"tile",p:p,i:i,el:e,t:t,cx:PX[p]+(t.c-1)*U+t.w*U/2,cy:(t.r-1)*U+t.h*U/2})});
  tiles[p]=arr;tick();updCount();return arr}
 function goPanel(p){if(p==curPanel)return;curPanel=p;$("strip").style.webkitTransform=$("strip").style.transform="translateX("+(MARGIN-PX[p])+"px)";tabsOn()}
@@ -188,7 +188,7 @@ function tick(){var d=new Date(),h=d.toLocaleTimeString("es-CO",{hour:"2-digit",
  $("clk").textContent=h;$("dt").textContent=d.toLocaleDateString("es-CO",{weekday:"short",day:"numeric",month:"short"});
  for(i=0;i<a.length;i++)a[i].textContent=h}
 var bgs=[];
-function mkBg(){if(typeof tizen==="undefined")document.documentElement.style.background="#101010";
+function mkBg(){if(typeof tizen==="undefined")document.documentElement.style.background="#232323";
  for(var i=0;i<4;i++){var d=document.createElement("div");d.className="bgf";document.body.insertBefore(d,document.body.firstChild);bgs.push(d)}setHole(null)}
 function box(d,x,y,w,h){d.style.left=x+"px";d.style.top=y+"px";d.style.width=w+"px";d.style.height=h+"px"}
 function setHole(r){if(!r){box(bgs[0],0,0,1920,1080);box(bgs[1],0,0,0,0);box(bgs[2],0,0,0,0);box(bgs[3],0,0,0,0);return}
