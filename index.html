@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><title>OneDash</title>
+<style>
+*{box-sizing:border-box;margin:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:#1c1c1c;color:#fff;font-family:"Segoe UI","Selawik","Open Sans",sans-serif}
+body:before{content:"";position:absolute;inset:0 0 auto 0;height:6px;background:#107c10}
+header{position:absolute;left:120px;right:120px;top:60px;display:flex;justify-content:space-between;align-items:baseline}
+h1{font-size:64px;font-weight:200;letter-spacing:-1px}
+#clock{font-size:36px;font-weight:300;color:#bbb}
+#grid{position:absolute;left:120px;top:210px;display:grid;grid-template-columns:repeat(6,248px);grid-auto-rows:248px;gap:8px}
+.tile{position:relative;padding:20px 24px;display:flex;flex-direction:column;justify-content:space-between;outline:0 solid #fff;transition:transform .12s}
+.tile .g{font-size:96px;font-weight:200;line-height:1}
+.tile.big .g{font-size:200px}
+.tile .n{font-size:28px;font-weight:400}
+.tile.big .n{font-size:40px}
+.tile.sel{transform:scale(1.04);outline:5px solid #fff;z-index:2}
+#hint{position:absolute;left:120px;bottom:50px;font-size:24px;color:#888}
+#apps{position:absolute;inset:0;background:#1c1c1ce8;display:none;padding:60px 120px}
+#apps h2{font-size:48px;font-weight:200;margin-bottom:24px}
+#list{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 12px;height:820px;overflow:hidden;align-content:start}
+.it{padding:14px 20px;background:#2d2d2d;font-size:28px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it small{display:block;font-size:18px;color:#999}
+.it.sel{background:#107c10}
+#toast{position:absolute;right:120px;bottom:50px;background:#c50f1f;padding:14px 22px;font-size:24px;display:none}
+</style></head><body>
+<header><h1>Inicio</h1><div id="clock"></div></header>
+<div id="grid"></div>
+<div id="hint">Flechas: mover · OK: abrir · Atrás: salir</div>
+<div id="apps"><h2>Mis apps — el ID aparece bajo cada nombre</h2><div id="list"></div></div>
+<div id="toast"></div>
+<script>
+// ===== CONFIGURA AQUÍ =====
+// c,r = columna,fila (desde 1); w,h = ancho,alto en celdas
+// id = ID de la app en el TV (usa "Mis apps" para ver los IDs reales de tu equipo)
+var TILES=[
+ {n:"Netflix",g:"N",id:"11101200001",c:1,r:1,w:2,h:2,bg:"#b20710"},
+ {n:"YouTube",g:"▶",id:"111299001912",c:3,r:1,w:2,h:1,bg:"#c4302b"},
+ {n:"Prime Video",g:"P",id:"3201512006785",c:5,r:1,w:1,h:1,bg:"#00a8e1"},
+ {n:"Spotify",g:"S",id:"3201606009684",c:3,r:2,w:1,h:1,bg:"#1db954"},
+ {n:"Disney+",g:"D",id:"3201901017640",c:4,r:2,w:1,h:1,bg:"#113ccf"},
+ {n:"Plex",g:"X",id:"3201512006963",c:5,r:2,w:1,h:1,bg:"#e5a00d"},
+ {n:"Mis apps",g:"▦",act:"apps",c:1,r:3,w:2,h:1,bg:"#107c10"},
+ {n:"Salir",g:"✕",act:"exit",c:3,r:3,w:1,h:1,bg:"#444"}
+];
+// ==========================
+var $=function(i){return document.getElementById(i)},grid=$("grid"),els=[],cur=0,mode="home",apps=[],ai=0;
+function toast(t){var e=$("toast");e.textContent=t;e.style.display="block";setTimeout(function(){e.style.display="none"},3500)}
+function launch(id){try{tizen.application.launch(id,null,function(e){toast("No se pudo abrir: "+e.message)})}catch(e){toast("Solo funciona dentro del TV ("+id+")")}}
+function exitApp(){try{tizen.application.getCurrentApplication().exit()}catch(e){}}
+TILES.forEach(function(t,i){var d=document.createElement("div");d.className="tile"+(t.w*t.h>2?" big":"");
+ d.style.cssText="grid-column:"+t.c+"/span "+t.w+";grid-row:"+t.r+"/span "+t.h+";background:"+t.bg;
+ d.innerHTML='<div class="g">'+t.g+'</div><div class="n">'+t.n+'</div>';grid.appendChild(d);els.push(d)});
+function sel(i){els[cur].classList.remove("sel");cur=i;els[cur].classList.add("sel")}
+function move(dx,dy){var a=els[cur].getBoundingClientRect(),ax=a.left+a.width/2,ay=a.top+a.height/2,best=-1,bd=1e9;
+ els.forEach(function(e,i){if(i==cur)return;var b=e.getBoundingClientRect(),x=b.left+b.width/2-ax,y=b.top+b.height/2-ay;
+  var main=dx?x*dx:y*dy,off=dx?Math.abs(y):Math.abs(x);if(main<=10)return;var d=main+off*2;if(d<bd){bd=d;best=i}});
+ if(best>=0)sel(best)}
+function openApps(){mode="apps";$("apps").style.display="block";var L=$("list");L.innerHTML="Cargando…";
+ try{tizen.application.getAppsInfo(function(a){apps=a.sort(function(x,y){return x.name.localeCompare(y.name)});ai=0;draw()},function(e){L.textContent="Error: "+e.message})}
+ catch(e){apps=[{name:"(prueba en PC)",id:"sin.tizen"}];ai=0;draw()}}
+function draw(){var L=$("list");L.innerHTML="";apps.forEach(function(a,i){var d=document.createElement("div");d.className="it"+(i==ai?" sel":"");
+ d.innerHTML=a.name+"<small>"+a.id+"</small>";L.appendChild(d)});var s=L.children[ai];if(s)L.scrollTop=Math.max(0,s.offsetTop-L.offsetTop-300)}
+function closeApps(){mode="home";$("apps").style.display="none"}
+document.addEventListener("keydown",function(e){var k=e.keyCode;
+ if(mode=="apps"){if(k==10009||k==8)closeApps();
+  else if(k==13&&apps[ai])launch(apps[ai].id);
+  else{var m={37:-1,39:1,38:-3,40:3}[k];if(m){ai=Math.max(0,Math.min(apps.length-1,ai+m));draw()}}return}
+ if(k==37)move(-1,0);else if(k==39)move(1,0);else if(k==38)move(0,-1);else if(k==40)move(0,1);
+ else if(k==13){var t=TILES[cur];t.act=="apps"?openApps():t.act=="exit"?exitApp():launch(t.id)}
+ else if(k==10009||k==8)exitApp()});
+try{tizen.tvinputdevice.registerKey("MediaPlay")}catch(e){}
+function tick(){var d=new Date();$("clock").textContent=d.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"})}
+tick();setInterval(tick,15000);sel(0);
+</script></body></html>
