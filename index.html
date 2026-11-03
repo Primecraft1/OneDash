@@ -6,9 +6,9 @@ html,body{width:1920px;height:1080px;overflow:hidden;background:transparent;colo
 #top,#top2{position:absolute;left:130px;top:40px;height:76px}
 #ava,#ava2{position:absolute;left:0;top:0;width:76px;height:76px;background:#0e7a0d center/cover no-repeat;display:flex;align-items:center;justify-content:center}
 #ava svg,#ava2 svg{width:46px;height:46px}
-#foot{position:absolute;right:130px;bottom:48px;display:flex;align-items:baseline}
-#dt{font-size:22px;color:#9a9a9a;text-transform:uppercase;letter-spacing:1px;margin-right:26px}
-#clk{font-size:40px;font-weight:300}
+#foot,#foot2{position:absolute;right:130px;bottom:48px;display:flex;align-items:baseline}
+#dt,#dt2{font-size:22px;color:#9a9a9a;text-transform:uppercase;letter-spacing:1px;margin-right:26px}
+#clk,#clk2{font-size:40px;font-weight:300}
 #right,#right2{position:absolute;right:130px;top:40px;width:76px;height:76px}
 #right svg,#right2 svg{width:76px;height:76px}
 #tabs{position:absolute;left:130px;top:150px;display:flex}
@@ -20,7 +20,7 @@ html,body{width:1920px;height:1080px;overflow:hidden;background:transparent;colo
 .tile{position:absolute;overflow:hidden;background:#555}
 #focus,#afocus,.ghost{position:absolute;border:3px solid #fff;box-sizing:border-box;box-shadow:0 14px 44px 6px rgba(0,0,0,.95);z-index:10;pointer-events:none}
 #focus,#afocus{display:none}.ghost{z-index:9}
-#top2,#right2{z-index:5}
+#top2,#right2,#foot2{z-index:5}
 .im{position:absolute;left:50%;top:26px;width:80px;height:80px;margin-left:-40px}
 .tile.live{background:transparent!important}.tile.live .ic{display:none}
 .bgf{position:absolute;background:#000;z-index:-1}
@@ -56,6 +56,8 @@ html,body{width:1920px;height:1080px;overflow:hidden;background:transparent;colo
 .gh{visibility:hidden}
 .nt{position:absolute;left:0;bottom:0;max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:8px 16px;font-size:24px;font-weight:300;z-index:10}
 .big .nt{font-size:30px;padding:10px 20px}
+.lw{max-width:50%!important;white-space:normal!important;font-size:19px!important;line-height:22px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-word}
+.big .lw{font-size:24px!important;line-height:28px}
 #toast{position:absolute;right:130px;bottom:40px;max-width:900px;background:#c50f1f;padding:14px 22px;font-size:24px;display:none;z-index:30}
 </style></head><body>
 <div id="ui">
@@ -65,7 +67,7 @@ html,body{width:1920px;height:1080px;overflow:hidden;background:transparent;colo
 <div id="tabs"></div>
 <div id="view"><div id="strip"></div></div>
 </div>
-<div id="apps"><div id="top2"><div id="ava2"></div></div><div id="right2"></div><div id="asb"><svg id="ring" viewBox="0 0 160 160" width="160" height="160"><circle cx="80" cy="80" r="70" fill="none" stroke="#1f1f1f" stroke-width="7"/><circle id="rfg" cx="80" cy="80" r="70" fill="none" stroke="#8ea3b3" stroke-width="7" transform="rotate(-90 80 80)" stroke-dasharray="0 440"/></svg><div id="rpct"></div><div id="rusd">usado</div><div id="rfree"></div></div><div id="ahead"><b>Instaladas</b>Recientes y A–Z</div><div id="aview"><div id="astrip"><div id="afocus"></div></div></div></div>
+<div id="apps"><div id="foot2"><div id="dt2"></div><div id="clk2"></div></div><div id="top2"><div id="ava2"></div></div><div id="right2"></div><div id="asb"><svg id="ring" viewBox="0 0 160 160" width="160" height="160"><circle cx="80" cy="80" r="70" fill="none" stroke="#1f1f1f" stroke-width="7"/><circle id="rfg" cx="80" cy="80" r="70" fill="none" stroke="#8ea3b3" stroke-width="7" transform="rotate(-90 80 80)" stroke-dasharray="0 440"/></svg><div id="rpct"></div><div id="rusd">usado</div><div id="rfree"></div></div><div id="ahead"><b>Instaladas</b>Recientes y A–Z</div><div id="aview"><div id="astrip"><div id="afocus"></div></div></div></div>
 <div id="toast"></div>
 <script>
 // ===== CONFIGURA AQUÍ =====
@@ -88,9 +90,9 @@ var SRC={
 var SETTINGS_ID=""; // ID de la app de Ajustes del TV (búscala en "Mis apps")
 var BROWSER_ID="org.tizen.browser"; // navegador del TV (verifica el ID en "Mis apps")
 var STORE_ID="";                    // app de tienda de apps de Samsung (búscala en "Mis apps")
-var PRESS=0.15; // grosor máximo del borde negro al pulsar OK (fracción del lado del tile)
+var PRESS=0.08; // grosor máximo del borde negro al pulsar OK (fracción del lado del tile)
 var AR=3;       // filas por columna: los tiles se llenan primero hacia abajo
-var SOUNDS={move:"sounds/move.wav",select:"sounds/select.wav",open:"sounds/open.wav",back:"sounds/back.wav"}; // reemplaza estos archivos por los tuyos
+var SOUNDS={move:"sounds/move.wav",select:"sounds/select.wav",open:"sounds/open.wav",back:"sounds/back.wav",page:"sounds/page.wav"}; // reemplaza estos archivos por los tuyos
 var VOLUME=0.6;
 var HIDE=[];    // IDs de apps que NO quieres ver en Mis apps
 var AVATAR="";      // ruta de una imagen dentro del proyecto, ej. "avatar.png"; vacío = icono genérico
@@ -134,25 +136,28 @@ function esc(x){return String(x).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
 function hue(n){var h=0,i;for(i=0;i<n.length;i++)h+=n.charCodeAt(i);return h%360}
 function stored(){try{return JSON.parse(localStorage.getItem("od_rec")||"[]")}catch(e){return[]}}
 function catKey(id){for(var k in APPS)if(APPS[k].id==id)return"a:"+k;return"x:"+id}
-function allKeys(){var o=[],k;for(k in APPS)o.push("a:"+k);for(k in SRC)o.push("s:"+k);apps.forEach(function(a){var c=catKey(a.id);if(c.charAt(0)=="x")o.push(c)});return o}
+function allKeys(){var o=[],k;for(k in APPS)o.push("a:"+k);for(k in SRC)o.push("s:"+k);for(k in SYS)o.push("y:"+k);apps.forEach(function(a){var c=catKey(a.id);if(c.charAt(0)=="x")o.push(c)});return o}
 function getRec(){var all=allKeys(),out=[];stored().concat(DEFAULT).concat(all).forEach(function(k){if(all.indexOf(k)>=0&&out.indexOf(k)<0)out.push(k)});return out}
 function record(k){if(!k)return;var r=stored().filter(function(x){return x!=k});r.unshift(k);try{localStorage.setItem("od_rec",JSON.stringify(r.slice(0,40)))}catch(e){}}
 function ext(t,o){for(var x in o)t[x]=o[x];return t}
 function appTile(k,o){var a=APPS[k];return ext({key:"a:"+k,n:a.n,id:a.id,bg:a.bg,g:a.g,ic:a.ic},o)}
 function srcTile(k,o){var s=SRC[k];return ext({key:"s:"+k,n:s.n,src:s,ic:k=="cp"?"av":k=="av"?"rca":k=="tv"?"tv":"hdmi",bg:G},o)}
+var SYS={settings:{n:"Ajustes",ic:"gear",act:"settings"},browser:{n:"Navegador",ic:"globe"},store:{n:"Tienda de apps",ic:"store"}};
+function sysTile(k,o){var y=SYS[k];return ext({key:"y:"+k,n:y.n,ic:y.ic,act:y.act,id:k=="browser"?BROWSER_ID:k=="store"?STORE_ID:"",bg:G},o)}
+function lc(t){return String(t.n).split(/\s+/).length>3?" lw":""}
 function appById(id){for(var i=0;i<apps.length;i++)if(apps[i].id==id)return apps[i];return null}
 function xTile(a,o){var n=a.name||"?";return ext({key:"x:"+a.id,n:n,id:a.id,img:a.iconPath,g:n.charAt(0).toUpperCase(),bg:"hsl("+hue(n)+",40%,26%)"},o)}
-function ent(key,o){var c=key.charAt(0);return c=="a"?appTile(key.slice(2),o):c=="x"?xTile(appById(key.slice(2)),o):srcTile(key.slice(2),o)}
+function ent(key,o){var c=key.charAt(0);return c=="a"?appTile(key.slice(2),o):c=="x"?xTile(appById(key.slice(2)),o):c=="y"?sysTile(key.slice(2),o):srcTile(key.slice(2),o)}
 function vfill(l,R){l.forEach(function(t,i){t.c=Math.floor(i/R)+1;t.r=i%R+1;t.w=1;t.h=1});return l}
 function homeTiles(){var r=getRec(),t=[ent(r[0],{c:1,r:1,w:4,h:2,lab:1,art:1})],i;
  for(i=1;i<=4;i++)t.push(ent(r[i],{c:i,r:3,w:1,h:1}));
- t.push({n:"Fuentes",ic:"monitor",act:"panel:2",bg:G,c:5,r:1,w:1,h:1},{n:"Ajustes",ic:"gear",act:"settings",bg:G,c:5,r:2,w:1,h:1},{n:"Mis apps",ic:"grid",act:"apps",bg:G,c:5,r:3,w:1,h:1});
+ t.push({n:"Fuentes",ic:"monitor",act:"panel:2",bg:G,c:5,r:1,w:1,h:1},sysTile("settings",{c:5,r:2,w:1,h:1}),{n:"Mis apps",ic:"grid",act:"apps",bg:G,c:5,r:3,w:1,h:1});
  BANNERS.forEach(function(b,i){t.push({banner:1,key:"a:"+b.app,id:APPS[b.app].id,n:b.title,tag:APPS[b.app].n,color:b.color,img:b.img,c:6,r:i+1,w:2,h:1,nv:1})});return t}
 var PANELS=[
  {name:"Marcas",cols:2,tiles:function(){return vfill(getRec().filter(function(k){return k.charAt(0)=="a"}).map(function(k){return appTile(k.slice(2),{})}),AR)}},
  {name:"Inicio",cols:7,tiles:homeTiles,label:{t:"Novedades",x:5*U+32,y:-38}},
  {name:"Fuentes",cols:4,tiles:function(){var l=getRec().filter(function(k){return k.charAt(0)=="s"}).map(function(k){return srcTile(k.slice(2),{})});
-  return vfill(l.concat([{n:"Ajustes",ic:"gear",act:"settings",bg:G},{n:"Navegador",ic:"globe",id:BROWSER_ID,bg:G},{n:"Tienda de apps",ic:"store",id:STORE_ID,bg:G},
+  return vfill(l.concat([sysTile("settings",{}),sysTile("browser",{}),sysTile("store",{}),
    {n:"Mis apps",ic:"grid",act:"apps",bg:G},{n:"Salir",ic:"power",act:"exit",bg:G}]),AR)}}
 ];
 var PX=[],tiles=[],tabs=[],tops=[],panelEl=[],curPanel=1,cur=null;
@@ -163,10 +168,10 @@ function mkTile(t){var d=document.createElement("div");d.className="tile"+(t.w*t
  d.style.cssText="left:"+l+"px;top:"+(t.r-1)*U+"px;width:"+w+"px;height:"+(t.h*U-8)+"px;background:"+bg;
  var h="";
  if(t.prof)h='<div class="av"></div><div class="pn">Mi TV</div><div class="pl">Samsung · Tizen</div><div class="pc"><b class="pclk"></b><span class="pcount">Mis apps</span></div>';
- else if(t.banner)h='<div class="tag" style="background:'+t.color+'">'+t.tag+'</div><div class="lab">'+esc(t.n)+'</div>';
+ else if(t.banner)h='<div class="tag" style="background:'+t.color+'">'+t.tag+'</div><div class="lab'+lc(t)+'">'+esc(t.n)+'</div>';
  else{if(t.art&&t.g)h+='<div class="wm">'+t.g+'</div>';
   else if(t.ic)h+='<div class="ic">'+IC[t.ic]+'</div>';else if(t.g&&!t.img)h+='<div class="ic">'+t.g+'</div>';
-  h+=(!t.key||t.key.charAt(0)=="s")?'<div class="lab"><span class="gh">'+esc(t.n)+'</span></div><div class="nt">'+esc(t.n)+'</div>':'<div class="lab">'+esc(t.n)+'</div>'}
+  h+=(!t.key||"sy".indexOf(t.key.charAt(0))>=0)?'<div class="lab'+lc(t)+'"><span class="gh">'+esc(t.n)+'</span></div><div class="nt'+lc(t)+'">'+esc(t.n)+'</div>':'<div class="lab'+lc(t)+'">'+esc(t.n)+'</div>'}
  d.innerHTML=h;
  if(t.img&&!t.art){var im=document.createElement("img");im.className="im";im.setAttribute("data-l",t.g||"?");
   im.onerror=function(){var q=document.createElement("div");q.className="ic";q.textContent=this.getAttribute("data-l");this.parentNode.replaceChild(q,this)};im.src=t.img;d.insertBefore(im,d.firstChild)}
@@ -199,12 +204,12 @@ function near(c,dx,dy){var best=null,bd=1e9,pool=[];
 function move(dx,dy){var c=cur,n=null;
  if(c.kind=="tab"){if(dx)n=tabs[c.p+dx];else if(dy>0)n=tiles[c.p][0]}
  else{n=near(c,dx,dy);if(!n&&dy<0)n=tabs[c.p]}
- if(n){sfx("move");sel(n)}}
+ if(n){sfx(n.p!==curPanel?"page":"move");sel(n)}}
+function run(t){if(t.src)setSource(t.src);else if(t.act=="settings"){if(SETTINGS_ID)launch(SETTINGS_ID);else toast("Falta el ID de Ajustes: búscalo en Mis apps y ponlo en SETTINGS_ID.")}else launch(t.id)}
 function act(it){var t=it.t;if(!t)return;
  if(t.act=="apps")openApps();else if(t.act=="exit")exitApp();
- else if(t.act=="settings"){if(SETTINGS_ID)launch(SETTINGS_ID);else toast("Falta el ID de Ajustes: búscalo en Mis apps y ponlo en SETTINGS_ID.")}
  else if(t.act&&t.act.indexOf("panel:")==0)sel(tiles[+t.act.slice(6)][0]);
- else{record(t.key);if(t.src)setSource(t.src);else launch(t.id)}}
+ else{record(t.key);run(t)}}
 function init(){PX=[];mkBg();var fo=document.createElement("div");fo.id="focus";$("strip").appendChild(fo);
  ["ava","ava2"].forEach(function(i){var av=$(i);if(AVATAR)av.style.backgroundImage="url("+AVATAR+")";else av.innerHTML=IC.user});
  $("right").innerHTML=$("right2").innerHTML=IC.monitor;
@@ -216,7 +221,7 @@ function init(){PX=[];mkBg();var fo=document.createElement("div");fo.id="focus";
  sel(tiles[1][0])}
 function refreshAll(){var was=cur&&cur.kind=="tile",p=curPanel,i;for(i=0;i<PANELS.length;i++)buildPanel(i);if(was)sel(p==1?tiles[1][0]:tiles[p][0]);else updatePreview()}
 function updCount(){var a=document.getElementsByClassName("pcount");for(var i=0;i<a.length;i++)if(apps.length)a[i].innerHTML=apps.length+" apps<br>instaladas"}
-function loadApps(cb){try{tizen.application.getAppsInfo(function(a){apps=a.filter(function(x){return HIDE.indexOf(x.id)<0}).sort(function(x,y){return x.name.localeCompare(y.name)});updCount();cb&&cb()},function(e){cb&&cb(e.message)})}catch(e){cb&&cb("x")}}
+function loadApps(cb){try{tizen.application.getAppsInfo(function(a){var me="";try{me=tizen.application.getCurrentApplication().appInfo.id}catch(e){}apps=a.filter(function(x){return HIDE.indexOf(x.id)<0&&x.id!=me}).sort(function(x,y){return x.name.localeCompare(y.name)});updCount();cb&&cb()},function(e){cb&&cb(e.message)})}catch(e){cb&&cb("x")}}
 var stor=null,aitems=[],ascroll=0,GL=130;
 function loadStorage(){try{tizen.systeminfo.getPropertyValue("STORAGE",function(r){var u=r.units||[],x=u[0],i;for(i=0;i<u.length;i++)if(u[i].type=="INTERNAL"){x=u[i];break}
  if(x&&x.capacity>0)stor={used:1-x.availableCapacity/x.capacity,free:x.availableCapacity}},function(){})}catch(e){}}
@@ -226,12 +231,18 @@ function setRing(){var sb=$("asb");if(!stor){sb.style.display="none";GL=130;retu
 function appByKey(k){var c=k.charAt(0),id=c=="x"?k.slice(2):(c=="a"&&APPS[k.slice(2)])?APPS[k.slice(2)].id:null;return id?appById(id):null}
 function sortedApps(){var out=[],seen={};stored().forEach(function(k){var a=appByKey(k);if(a&&!seen[a.id]){seen[a.id]=1;out.push(a)}});
  return out.concat(apps.filter(function(a){return !seen[a.id]}))}
+function appsList(){var cand=[],k;
+ for(k in SYS)(function(k){cand.push({key:"y:"+k,name:SYS[k].n,mk:function(o){return sysTile(k,o)}})})(k);
+ for(k in APPS)(function(k){cand.push({key:"a:"+k,name:APPS[k].n,mk:function(o){return appTile(k,o)}})})(k);
+ apps.forEach(function(a){var c=catKey(a.id);if(c.charAt(0)=="x")cand.push({key:c,name:a.name||"?",mk:function(o){return xTile(a,o)}})});
+ var out=[],seen={};stored().forEach(function(sk){for(var i=0;i<cand.length;i++)if(cand[i].key==sk&&!seen[sk]){seen[sk]=1;out.push(cand[i])}});
+ return out.concat(cand.filter(function(c){return !seen[c.key]}).sort(function(a,b){return a.name.localeCompare(b.name)}))}
 function buildApps(){var S=$("astrip"),old=S.querySelectorAll(".tile"),i;for(i=0;i<old.length;i++)S.removeChild(old[i]);aitems=[];
- sortedApps().forEach(function(a,n){var k=catKey(a.id),o={c:Math.floor(n/AR)+1,r:n%AR+1,w:1,h:1},t=k.charAt(0)=="a"?appTile(k.slice(2),o):xTile(a,o),e=mkTile(t);S.appendChild(e);aitems.push({el:e,t:t})});
+ appsList().forEach(function(c,n){var t=c.mk({c:Math.floor(n/AR)+1,r:n%AR+1,w:1,h:1}),e=mkTile(t);S.appendChild(e);aitems.push({el:e,t:t})});
  ascroll=0;ai=0;if(aitems.length)asel(0)}
 function asel(i){if(aitems[ai])aitems[ai].el.classList.remove("sel");ai=i;var it=aitems[i],t=it.t,col=Math.floor(i/AR),vc=Math.floor((1920-GL-60)/U),S=$("astrip");
  it.el.classList.add("sel");if(col<ascroll)ascroll=col;else if(col>ascroll+vc-1)ascroll=col-vc+1;
- S.style.webkitTransform=S.style.transform="translateX("+(10-ascroll*U)+"px)";frame("afocus","astrip",(t.c-1)*U+10,(t.r-1)*U,U-8,U-8)}
+ S.style.webkitTransform=S.style.transform="translateX("+(10-ascroll*U)+"px)";frame("afocus","astrip",(t.c-1)*U,(t.r-1)*U,U-8,U-8)}
 function anav(dx,dy){var n=aitems.length,i=ai,c=Math.floor(i/AR),r=i%AR,j=-1;
  if(dy<0&&r>0)j=i-1;else if(dy>0&&r<AR-1&&i+1<n)j=i+1;else if(dx<0&&i-AR>=0)j=i-AR;
  else if(dx>0){j=i+AR;if(j>=n)j=Math.floor((n-1)/AR)>c?n-1:-1}
@@ -253,15 +264,15 @@ function sfx(n){try{var a=AUD[n];if(!a){a=AUD[n]=new Audio(SOUNDS[n]);a.volume=V
 function loadSounds(){for(var n in SOUNDS){try{var a=AUD[n]=new Audio(SOUNDS[n]);a.preload="auto";a.volume=VOLUME}catch(e){}}}
 document.addEventListener("keydown",function(e){var k=e.keyCode;if(busy)return;
  if(mode=="apps"){if(k==10009||k==8)closeApps();
-  else if(k==13){var it=aitems[ai];if(it){busy=1;sfx("select");pressFx(it.el);leave($("apps"),"in");setTimeout(function(){busy=0;record(it.t.key);launch(it.t.id);setTimeout(function(){if(!document.hidden)restoreUI()},1800)},230)}}
+  else if(k==13){var it=aitems[ai];if(it){busy=1;sfx("select");pressFx(it.el);leave($("apps"),"in");setTimeout(function(){busy=0;record(it.t.key);run(it.t);setTimeout(function(){if(!document.hidden)restoreUI()},1800)},230)}}
   else if(k==37)anav(-1,0);else if(k==39)anav(1,0);else if(k==38)anav(0,-1);else if(k==40)anav(0,1);return}
  if(k==37)move(-1,0);else if(k==39)move(1,0);else if(k==38)move(0,-1);else if(k==40)move(0,1);
  else if(k==13){if(cur.kind=="tab")move(0,1);else openTile(cur)}
  else if(k==10009||k==8){if(curPanel!=1){sfx("back");sel(tiles[1][0])}else exitApp()}});
 document.addEventListener("visibilitychange",function(){if(document.hidden)stopPreview();else{restoreUI();refreshAll()}});
-function tick(){var d=new Date(),h=d.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"}),a=document.getElementsByClassName("pclk"),i;
- $("clk").textContent=h;$("dt").textContent=d.toLocaleDateString("es-CO",{weekday:"short",day:"numeric",month:"short"});
- for(i=0;i<a.length;i++)a[i].textContent=h}
+var DN=["dom","lun","mar","mié","jue","vie","sáb"],MN=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+function tick(){var d=new Date(),H=d.getHours(),m=d.getMinutes(),t=((H%12)||12)+":"+(m<10?"0":"")+m+" "+(H<12?"AM":"PM"),f=DN[d.getDay()]+" "+d.getDate()+" "+MN[d.getMonth()];
+ $("clk").textContent=$("clk2").textContent=t;$("dt").textContent=$("dt2").textContent=f}
 var bgs=[];
 function mkBg(){if(typeof tizen==="undefined")document.documentElement.style.background="#000";
  for(var i=0;i<4;i++){var d=document.createElement("div");d.className="bgf";document.body.insertBefore(d,document.body.firstChild);bgs.push(d)}setHole(null)}
