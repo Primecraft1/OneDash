@@ -3,12 +3,14 @@
 <style>
 *{box-sizing:border-box;margin:0}
 html,body{width:1920px;height:1080px;overflow:hidden;background:#101010;color:#fff;font-family:"Segoe UI","Selawik","Open Sans",sans-serif}
-#top{position:absolute;left:130px;top:44px;display:flex}
-.sm{position:relative;width:64px;height:64px;margin-right:6px;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:300}
-.sm svg{width:40px;height:40px}
-#right{position:absolute;right:130px;top:40px;display:flex;align-items:center}
-#dt{font-size:20px;color:#107c10;letter-spacing:1px;text-transform:uppercase;margin-right:22px}
-#ring{width:76px;height:76px;border:5px solid #107c10;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px}
+#top{position:absolute;left:130px;top:40px;height:76px}
+#ava{position:absolute;left:0;top:0;width:76px;height:76px;border-radius:50%;background:#0e7a0d center/cover no-repeat;display:flex;align-items:center;justify-content:center}
+#ava svg{width:46px;height:46px}
+#who{position:absolute;left:98px;top:2px;white-space:nowrap}
+#clk{font-size:38px;font-weight:300;line-height:42px}
+#dt{font-size:20px;color:#9bd29b;text-transform:uppercase;letter-spacing:1px}
+#right{position:absolute;right:130px;top:40px;width:76px;height:76px}
+#right svg{width:76px;height:76px}
 #tabs{position:absolute;left:130px;top:150px;display:flex}
 .tab{font-size:54px;font-weight:200;color:#6e6e6e;padding-bottom:4px;margin-right:44px;border-bottom:5px solid transparent}
 .tab.on{color:#fff}.tab.sel{border-bottom-color:#107c10}
@@ -38,8 +40,8 @@ html,body{width:1920px;height:1080px;overflow:hidden;background:#101010;color:#f
 .it small{display:block;font-size:18px;color:#999}.it.sel{background:#107c10}
 #toast{position:absolute;right:130px;bottom:40px;max-width:900px;background:#c50f1f;padding:14px 22px;font-size:24px;display:none;z-index:30}
 </style></head><body>
-<div id="top"></div>
-<div id="right"><div id="dt"></div><div id="ring"></div></div>
+<div id="top"><div id="ava"></div><div id="who"><div id="clk"></div><div id="dt"></div></div></div>
+<div id="right"></div>
 <div id="tabs"></div>
 <div id="view"><div id="strip"></div></div>
 <div id="apps"><h2>Mis apps (el ID aparece bajo cada nombre)</h2><div id="list"></div></div>
@@ -58,14 +60,14 @@ var APPS={
 // Cambiar de fuente desde una app suele estar bloqueado en TVs Samsung 2017.
 // Si encuentras un ID de app de fuentes en "Mis apps", ponlo en "id".
 var SRC={
- h1:{n:"HDMI 1",type:"HDMI",num:1,id:""},h2:{n:"HDMI 2",type:"HDMI",num:2,id:""},
- h3:{n:"HDMI 3",type:"HDMI",num:3,id:""},av:{n:"AV / Componente",type:"COMPONENT",num:1,id:""},
- tv:{n:"TV en vivo",type:"TV",num:1,id:""},menu:{n:"Menú de fuentes",type:"",num:0,id:"",menu:1}
+ h1:{n:"HDMI 1",type:"HDMI",num:1,id:""},h2:{n:"HDMI 2",type:"HDMI",num:2,id:""},h3:{n:"HDMI 3",type:"HDMI",num:3,id:""},
+ cp:{n:"Video por componentes",type:"COMPONENT",num:1,id:""},av:{n:"Video compuesto",type:"AV",num:1,id:""},
+ tv:{n:"TV por aire",type:"TV",num:1,id:""}
 };
+var SETTINGS_ID=""; // ID de la app de Ajustes del TV (búscala en "Mis apps")
+var AVATAR="";      // ruta de una imagen dentro del proyecto, ej. "avatar.png"; vacío = icono genérico
 var MENU_SOURCE_ID="";
 var DEFAULT=["a:netflix","a:youtube","a:prime","s:h1","a:spotify","a:disney","s:h2","a:plex"];
-var TOPBAR=["netflix","youtube","prime","spotify","disney","plex"];
-var TOPCOL={netflix:"#e8432e",youtube:"#c4302b",prime:"#00a2e8",spotify:"#1db954",disney:"#1b44c8",plex:"#e5a00d"};
 // ==========================
 var IC={
  monitor:'<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3"><path d="M6 10h36v22H6zM16 41h16M24 32v9"/></svg>',
@@ -75,6 +77,9 @@ var IC={
  tv:'<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3"><path d="M6 16h36v24H6zM16 6l8 10 8-10"/></svg>',
  av:'<svg viewBox="0 0 48 48" fill="#fff"><circle cx="12" cy="24" r="6"/><circle cx="24" cy="24" r="6"/><circle cx="36" cy="24" r="6"/></svg>',
  power:'<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3.5"><path d="M24 6v18M14 13a16 16 0 1 0 20 0"/></svg>',
+ user:'<svg viewBox="0 0 48 48" fill="#fff"><circle cx="24" cy="17" r="9"/><path d="M6 44c0-11 8-16 18-16s18 5 18 16z"/></svg>',
+ gear:'<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3"><circle cx="24" cy="24" r="8"/><circle cx="24" cy="24" r="16" stroke-width="7" stroke-dasharray="6.28 6.28"/></svg>',
+ rca:'<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3"><circle cx="24" cy="24" r="14"/><circle cx="24" cy="24" r="5" fill="#fff"/></svg>',
  globe:'<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3"><circle cx="24" cy="24" r="17"/><path d="M7 24h34M24 7c-9 9-9 25 0 34M24 7c9 9 9 25 0 34"/></svg>'
 };
 var U=208,G="#0e7a0d",MARGIN=130,GAP=48;
@@ -95,19 +100,19 @@ function getRec(){var s=[],all=allKeys(),out=[];try{s=JSON.parse(localStorage.ge
 function record(k){if(!k)return;var r=getRec().filter(function(x){return x!=k});r.unshift(k);try{localStorage.setItem("od_rec",JSON.stringify(r.slice(0,20)))}catch(e){}}
 function ext(t,o){for(var x in o)t[x]=o[x];return t}
 function appTile(k,o){var a=APPS[k];return ext({key:"a:"+k,n:a.n,id:a.id,bg:a.bg,g:a.g,ic:a.ic},o)}
-function srcTile(k,o){var s=SRC[k];return ext({key:k=="menu"?"":"s:"+k,n:s.n,src:s,ic:k=="av"?"av":k=="tv"?"tv":k=="menu"?"monitor":"hdmi",bg:"#555"},o)}
+function srcTile(k,o){var s=SRC[k];return ext({key:"s:"+k,n:s.n,src:s,ic:k=="cp"?"av":k=="av"?"rca":k=="tv"?"tv":"hdmi",bg:"#555"},o)}
 function ent(key,o){return key.charAt(0)=="a"?appTile(key.slice(2),o):srcTile(key.slice(2),o)}
 function homeTiles(){var r=getRec(),t=[{prof:1,act:"apps",bg:G,c:1,r:1,w:1,h:3},ent(r[0],{c:2,r:1,w:4,h:2,lab:1,art:1})],i;
  for(i=1;i<=4;i++)t.push(ent(r[i],{c:i+1,r:3,w:1,h:1}));
- t.push({n:"Fuentes",ic:"monitor",act:"panel:2",bg:G,c:6,r:1,w:1,h:1},{n:"Mis apps",ic:"grid",act:"apps",bg:G,c:6,r:2,w:1,h:1},{n:"Salir",ic:"power",act:"exit",bg:G,c:6,r:3,w:1,h:1});
+ t.push({n:"Fuentes",ic:"monitor",act:"panel:2",bg:G,c:6,r:1,w:1,h:1},{n:"Ajustes",ic:"gear",act:"settings",bg:G,c:6,r:2,w:1,h:1},{n:"Mis apps",ic:"grid",act:"apps",bg:G,c:6,r:3,w:1,h:1});
  for(i=5;i<=7;i++)t.push(ent(r[i],{c:7,r:i-4,w:2,h:1,nv:1}));return t}
 var PANELS=[
  {name:"Favoritos",cols:6,tiles:function(){return[appTile("netflix",{c:1,r:1,w:2,h:2,lab:1,art:1}),appTile("youtube",{c:3,r:1,w:2,h:1}),appTile("prime",{c:5,r:1}),
   appTile("spotify",{c:3,r:2}),appTile("disney",{c:4,r:2}),appTile("plex",{c:5,r:2}),
   {n:"Mis apps",ic:"grid",act:"apps",bg:G,c:1,r:3,w:2,h:1},{n:"Salir",ic:"power",act:"exit",bg:"#444",c:3,r:3}]}},
  {name:"Inicio",cols:8,tiles:homeTiles,label:{t:"Recientes",x:6*U+32,y:-38}},
- {name:"Fuentes",cols:6,tiles:function(){return[srcTile("h1",{c:1,r:1,w:2,h:2,lab:1,bg:"#2b3a55"}),srcTile("h2",{c:3,r:1,w:2,h:1,bg:"#1b44c8"}),
-  srcTile("h3",{c:5,r:1}),srcTile("av",{c:3,r:2}),srcTile("tv",{c:4,r:2,bg:G}),srcTile("menu",{c:5,r:2,bg:G})]}}
+ {name:"Fuentes",cols:6,tiles:function(){return[srcTile("h1",{c:1,r:1,w:2,h:2,lab:1,bg:"#2b3a55"}),srcTile("h2",{c:3,r:1,bg:"#1b44c8"}),srcTile("h3",{c:4,r:1,bg:"#1b44c8"}),
+  srcTile("cp",{c:5,r:1}),srcTile("av",{c:6,r:1}),srcTile("tv",{c:3,r:2,w:2,h:1,bg:G}),{n:"Ajustes",ic:"gear",act:"settings",bg:G,c:5,r:2,w:2,h:1}]}}
 ];
 var PX=[],tiles=[],tabs=[],tops=[],panelEl=[],curPanel=1,cur=null;
 function mkTile(t){var d=document.createElement("div");d.className="tile"+(t.w*t.h>=4?" big":"")+(t.prof?" prof":"");
@@ -132,18 +137,17 @@ function near(c,dx,dy){var best=null,bd=1e9,pool=[];
  pool.forEach(function(it){if(it==c)return;var x=it.cx-c.cx,y=it.cy-c.cy,m=dx?x*dx:y*dy,o=dx?Math.abs(y):Math.abs(x);
   if(m<=10)return;var d=m+o*2;if(d<bd){bd=d;best=it}});return best}
 function move(dx,dy){var c=cur,n=null;
- if(c.kind=="top"){if(dx)n=tops[c.i+dx];else if(dy>0)n=tabs[curPanel]}
- else if(c.kind=="tab"){if(dx)n=tabs[c.p+dx];else n=dy>0?tiles[c.p][0]:tops[0]}
+ if(c.kind=="tab"){if(dx)n=tabs[c.p+dx];else if(dy>0)n=tiles[c.p][0]}
  else{n=near(c,dx,dy);if(!n&&dy<0)n=tabs[c.p]}
  if(n)sel(n)}
 function act(it){var t=it.t;if(!t)return;
  if(t.act=="apps")openApps();else if(t.act=="exit")exitApp();
+ else if(t.act=="settings"){if(SETTINGS_ID)launch(SETTINGS_ID);else toast("Falta el ID de Ajustes: búscalo en Mis apps y ponlo en SETTINGS_ID.")}
  else if(t.act&&t.act.indexOf("panel:")==0)sel(tiles[+t.act.slice(6)][0]);
  else{record(t.key);if(t.src)setSource(t.src);else launch(t.id)}}
-function init(){var x=MARGIN,T=$("top");PX=[];
- var lg=document.createElement("div");lg.className="sm";lg.style.background=G;lg.innerHTML=IC.globe;T.appendChild(lg);
- TOPBAR.forEach(function(k,i){var d=document.createElement("div");d.className="sm";d.style.background=TOPCOL[k];d.textContent=APPS[k].g||"▶";if(!APPS[k].g)d.innerHTML=IC.play;
-  T.appendChild(d);tops.push({kind:"top",i:i,el:d,t:{key:"a:"+k,id:APPS[k].id}})});
+function init(){PX=[];
+ var av=$("ava");if(AVATAR)av.style.backgroundImage="url("+AVATAR+")";else av.innerHTML=IC.user;
+ $("right").innerHTML=IC.monitor;
  var px=0;PANELS.forEach(function(P,p){PX[p]=px;px+=P.cols*U-8+GAP;
   var e=document.createElement("div");e.className="panel";e.style.cssText="left:"+PX[p]+"px;width:"+(P.cols*U-8)+"px";$("strip").appendChild(e);panelEl.push(e);
   var d=document.createElement("div");d.className="tab";d.textContent=P.name;$("tabs").appendChild(d);tabs.push({kind:"tab",p:p,el:d})});
@@ -162,11 +166,11 @@ document.addEventListener("keydown",function(e){var k=e.keyCode;
   else if(k==13&&apps[ai])launch(apps[ai].id);
   else{var m={37:-1,39:1,38:-3,40:3}[k];if(m){ai=Math.max(0,Math.min(apps.length-1,ai+m));draw()}}return}
  if(k==37)move(-1,0);else if(k==39)move(1,0);else if(k==38)move(0,-1);else if(k==40)move(0,1);
- else if(k==13){if(cur.kind=="tab")move(0,1);else if(cur.kind=="top"){record(cur.t.key);launch(cur.t.id)}else act(cur)}
+ else if(k==13){if(cur.kind=="tab")move(0,1);else act(cur)}
  else if(k==10009||k==8){if(curPanel!=1)sel(tiles[1][1]);else exitApp()}});
 document.addEventListener("visibilitychange",function(){if(!document.hidden)refreshHome()});
 function tick(){var d=new Date(),h=d.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"}),a=document.getElementsByClassName("pclk"),i;
- $("ring").textContent=h;$("dt").textContent=d.toLocaleDateString("es-CO",{weekday:"short",day:"numeric",month:"short"});
+ $("clk").textContent=h;$("dt").textContent=d.toLocaleDateString("es-CO",{weekday:"short",day:"numeric",month:"short"});
  for(i=0;i<a.length;i++)a[i].textContent=h}
 init();setInterval(tick,15000);loadApps();
 </script></body></html>
