@@ -2,7 +2,7 @@
 <html lang="es"><head><meta charset="utf-8"><title>OneDash</title>
 <style>
 *{box-sizing:border-box;margin:0}
-html,body{width:1920px;height:1080px;overflow:hidden;background:#101010;color:#fff;font-family:"Segoe UI","Selawik","Open Sans",sans-serif}
+html,body{width:1920px;height:1080px;overflow:hidden;background:transparent;color:#fff;font-family:"Segoe UI","Selawik","Open Sans",sans-serif}
 #top{position:absolute;left:130px;top:40px;height:76px}
 #ava{position:absolute;left:0;top:0;width:76px;height:76px;border-radius:50%;background:#0e7a0d center/cover no-repeat;display:flex;align-items:center;justify-content:center}
 #ava svg{width:46px;height:46px}
@@ -14,16 +14,19 @@ html,body{width:1920px;height:1080px;overflow:hidden;background:#101010;color:#f
 #tabs{position:absolute;left:130px;top:150px;display:flex}
 .tab{font-size:54px;font-weight:200;color:#6e6e6e;padding-bottom:4px;margin-right:44px;border-bottom:5px solid transparent}
 .tab.on{color:#fff}.tab.sel{border-bottom-color:#107c10}
-#view{position:absolute;left:0;top:300px;width:1920px;height:700px;overflow:hidden}
-#strip{position:absolute;left:0;top:0;width:4400px;height:700px;transition:transform .55s cubic-bezier(.22,.8,.2,1)}
+#view{position:absolute;left:0;top:280px;width:1920px;height:740px;overflow:hidden}
+#strip{position:absolute;left:0;top:20px;width:4400px;height:700px;transition:transform .55s cubic-bezier(.22,.8,.2,1)}
 .panel{position:absolute;top:0;height:700px}
 .tile{position:absolute;overflow:hidden;background:#555}
-.tile.sel:after,.sm.sel:after{content:"";position:absolute;left:0;top:0;right:0;bottom:0;border:5px solid #fff;z-index:6}
+#focus{position:absolute;display:none;border:6px solid #fff;box-sizing:border-box;box-shadow:0 12px 40px rgba(0,0,0,.9);z-index:10;pointer-events:none;transition:left .14s,top .14s,width .14s,height .14s}
+.tile.live{background:transparent!important}.tile.live .ic{display:none}
+.bgf{position:absolute;background:#101010;z-index:-1}
+.tag{position:absolute;left:16px;top:14px;padding:2px 12px;font-size:22px;font-weight:600}
 .ic{position:absolute;left:0;right:0;top:34px;text-align:center;font-size:84px;font-weight:200;line-height:92px}
 .ic svg{width:88px;height:88px}
 .big .ic{top:62px}.big .ic svg{width:150px;height:150px}
 .n{position:absolute;left:16px;bottom:12px;font-size:22px}
-.lab{position:absolute;left:0;bottom:0;background:rgba(0,0,0,.72);padding:10px 22px;font-size:34px;font-weight:300}
+.lab{position:absolute;left:0;bottom:0;max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;background:rgba(0,0,0,.72);padding:10px 22px;font-size:34px;font-weight:300}
 .wm{position:absolute;right:30px;top:-20px;font-size:380px;font-weight:700;opacity:.22;line-height:1}
 .prof{padding:14px 16px}
 .av{width:100px;height:100px;background:#e8432e;position:relative;margin-bottom:12px}
@@ -66,6 +69,13 @@ var SRC={
 };
 var SETTINGS_ID=""; // ID de la app de Ajustes del TV (búscala en "Mis apps")
 var AVATAR="";      // ruta de una imagen dentro del proyecto, ej. "avatar.png"; vacío = icono genérico
+// Banners de la derecha. Netflix y Prime no tienen API pública: puedes poner tu propia imagen (img) y texto.
+// YouTube puede mostrar el video en tendencia si pones una API key gratuita de YouTube Data API v3.
+var BANNERS=[{app:"netflix",color:"#b20710",title:"Sigue viendo en Netflix",img:""},
+ {app:"youtube",color:"#c4302b",title:"Tendencias en YouTube",img:""},
+ {app:"prime",color:"#00a2e8",title:"Novedades en Prime Video",img:""}];
+var YT_KEY="",YT_REGION="CO";
+var PREVIEW=true; // muestra la entrada en vivo en el tile grande (requiere API tvwindow; puede cambiar la fuente del TV)
 var MENU_SOURCE_ID="";
 var DEFAULT=["a:netflix","a:youtube","a:prime","s:h1","a:spotify","a:disney","s:h2","a:plex"];
 // ==========================
@@ -100,26 +110,28 @@ function getRec(){var s=[],all=allKeys(),out=[];try{s=JSON.parse(localStorage.ge
 function record(k){if(!k)return;var r=getRec().filter(function(x){return x!=k});r.unshift(k);try{localStorage.setItem("od_rec",JSON.stringify(r.slice(0,20)))}catch(e){}}
 function ext(t,o){for(var x in o)t[x]=o[x];return t}
 function appTile(k,o){var a=APPS[k];return ext({key:"a:"+k,n:a.n,id:a.id,bg:a.bg,g:a.g,ic:a.ic},o)}
-function srcTile(k,o){var s=SRC[k];return ext({key:"s:"+k,n:s.n,src:s,ic:k=="cp"?"av":k=="av"?"rca":k=="tv"?"tv":"hdmi",bg:"#555"},o)}
+function srcTile(k,o){var s=SRC[k];return ext({key:"s:"+k,n:s.n,src:s,ic:k=="cp"?"av":k=="av"?"rca":k=="tv"?"tv":"hdmi",bg:G},o)}
 function ent(key,o){return key.charAt(0)=="a"?appTile(key.slice(2),o):srcTile(key.slice(2),o)}
 function homeTiles(){var r=getRec(),t=[{prof:1,act:"apps",bg:G,c:1,r:1,w:1,h:3},ent(r[0],{c:2,r:1,w:4,h:2,lab:1,art:1})],i;
  for(i=1;i<=4;i++)t.push(ent(r[i],{c:i+1,r:3,w:1,h:1}));
  t.push({n:"Fuentes",ic:"monitor",act:"panel:2",bg:G,c:6,r:1,w:1,h:1},{n:"Ajustes",ic:"gear",act:"settings",bg:G,c:6,r:2,w:1,h:1},{n:"Mis apps",ic:"grid",act:"apps",bg:G,c:6,r:3,w:1,h:1});
- for(i=5;i<=7;i++)t.push(ent(r[i],{c:7,r:i-4,w:2,h:1,nv:1}));return t}
+ BANNERS.forEach(function(b,i){t.push({banner:1,key:"a:"+b.app,id:APPS[b.app].id,n:b.title,tag:APPS[b.app].n,color:b.color,img:b.img,c:7,r:i+1,w:2,h:1,nv:1})});return t}
 var PANELS=[
- {name:"Favoritos",cols:6,tiles:function(){return[appTile("netflix",{c:1,r:1,w:2,h:2,lab:1,art:1}),appTile("youtube",{c:3,r:1,w:2,h:1}),appTile("prime",{c:5,r:1}),
-  appTile("spotify",{c:3,r:2}),appTile("disney",{c:4,r:2}),appTile("plex",{c:5,r:2}),
-  {n:"Mis apps",ic:"grid",act:"apps",bg:G,c:1,r:3,w:2,h:1},{n:"Salir",ic:"power",act:"exit",bg:"#444",c:3,r:3}]}},
- {name:"Inicio",cols:8,tiles:homeTiles,label:{t:"Recientes",x:6*U+32,y:-38}},
- {name:"Fuentes",cols:6,tiles:function(){return[srcTile("h1",{c:1,r:1,w:2,h:2,lab:1,bg:"#2b3a55"}),srcTile("h2",{c:3,r:1,bg:"#1b44c8"}),srcTile("h3",{c:4,r:1,bg:"#1b44c8"}),
-  srcTile("cp",{c:5,r:1}),srcTile("av",{c:6,r:1}),srcTile("tv",{c:3,r:2,w:2,h:1,bg:G}),{n:"Ajustes",ic:"gear",act:"settings",bg:G,c:5,r:2,w:2,h:1}]}}
+ {name:"Fijados",cols:6,tiles:function(){return[appTile("netflix",{c:1,r:1}),appTile("youtube",{c:2,r:1}),appTile("prime",{c:3,r:1}),
+  appTile("spotify",{c:4,r:1}),appTile("disney",{c:5,r:1}),appTile("plex",{c:6,r:1})]}},
+ {name:"Inicio",cols:8,tiles:homeTiles,label:{t:"Novedades",x:6*U+32,y:-38}},
+ {name:"Fuentes",cols:6,tiles:function(){return[srcTile("h1",{c:1,r:1}),srcTile("h2",{c:2,r:1}),srcTile("h3",{c:3,r:1}),srcTile("cp",{c:4,r:1}),srcTile("av",{c:5,r:1}),srcTile("tv",{c:6,r:1}),
+  {n:"Ajustes",ic:"gear",act:"settings",bg:G,c:1,r:2},{n:"Mis apps",ic:"grid",act:"apps",bg:G,c:2,r:2},{n:"Salir",ic:"power",act:"exit",bg:G,c:3,r:2}]}}
 ];
 var PX=[],tiles=[],tabs=[],tops=[],panelEl=[],curPanel=1,cur=null;
 function mkTile(t){var d=document.createElement("div");d.className="tile"+(t.w*t.h>=4?" big":"")+(t.prof?" prof":"");
- var l=(t.c-1)*U+(t.nv?32:0),w=t.w*U-8-(t.nv?32:0);
- d.style.cssText="left:"+l+"px;top:"+(t.r-1)*U+"px;width:"+w+"px;height:"+(t.h*U-8)+"px;background:"+(t.art?"radial-gradient(circle at 70% 35%,rgba(255,255,255,.3),rgba(0,0,0,.6) 90%),":"")+t.bg;
+ var l=(t.c-1)*U+(t.nv?32:0),w=t.w*U-8-(t.nv?32:0),bg;
+ if(t.banner)bg=t.img?"linear-gradient(to top,rgba(0,0,0,.7),rgba(0,0,0,.05)),url("+t.img+") center/cover,"+t.color:"linear-gradient(135deg,"+t.color+",#151515)";
+ else bg=(t.art?"radial-gradient(circle at 70% 35%,rgba(255,255,255,.3),rgba(0,0,0,.6) 90%),":"")+t.bg;
+ d.style.cssText="left:"+l+"px;top:"+(t.r-1)*U+"px;width:"+w+"px;height:"+(t.h*U-8)+"px;background:"+bg;
  var h="";
  if(t.prof)h='<div class="av"></div><div class="pn">Mi TV</div><div class="pl">Samsung · Tizen</div><div class="pc"><b class="pclk"></b><span class="pcount">Mis apps</span></div>';
+ else if(t.banner)h='<div class="tag" style="background:'+t.color+'">'+t.tag+'</div><div class="lab">'+t.n+'</div>';
  else{if(t.art&&t.g)h+='<div class="wm">'+t.g+'</div>';
   else if(t.ic)h+='<div class="ic">'+IC[t.ic]+'</div>';else if(t.g)h+='<div class="ic">'+t.g+'</div>';
   h+=t.lab?'<div class="lab">'+t.n+'</div>':'<div class="n">'+t.n+'</div>'}
@@ -131,7 +143,10 @@ function buildPanel(p){var P=panelEl[p],old=tiles[p]||[];P.innerHTML="";var arr=
  tiles[p]=arr;tick();updCount();return arr}
 function goPanel(p){if(p==curPanel)return;curPanel=p;$("strip").style.webkitTransform=$("strip").style.transform="translateX("+(MARGIN-PX[p])+"px)";tabsOn()}
 function tabsOn(){tabs.forEach(function(t){t.el.className="tab"+(t.p==curPanel?" on":"")+(t==cur?" sel":"")})}
-function sel(it){if(cur)cur.el.classList.remove("sel");cur=it;it.el.classList.add("sel");if(it.kind!="top")goPanel(it.p);tabsOn()}
+function placeFocus(it){var f=$("focus");if(it.kind!="tile"){f.style.display="none";return}
+ var t=it.t,l=(t.c-1)*U+(t.nv?32:0),w=t.w*U-8-(t.nv?32:0);
+ f.style.display="block";f.style.left=(PX[it.p]+l-10)+"px";f.style.top=((t.r-1)*U-10)+"px";f.style.width=(w+20)+"px";f.style.height=(t.h*U-8+20)+"px"}
+function sel(it){cur=it;if(it.kind!="top")goPanel(it.p);tabsOn();placeFocus(it);updatePreview()}
 function near(c,dx,dy){var best=null,bd=1e9,pool=[];
  if(dx)tiles.forEach(function(a){pool=pool.concat(a)});else pool=tiles[c.p];
  pool.forEach(function(it){if(it==c)return;var x=it.cx-c.cx,y=it.cy-c.cy,m=dx?x*dx:y*dy,o=dx?Math.abs(y):Math.abs(x);
@@ -145,7 +160,7 @@ function act(it){var t=it.t;if(!t)return;
  else if(t.act=="settings"){if(SETTINGS_ID)launch(SETTINGS_ID);else toast("Falta el ID de Ajustes: búscalo en Mis apps y ponlo en SETTINGS_ID.")}
  else if(t.act&&t.act.indexOf("panel:")==0)sel(tiles[+t.act.slice(6)][0]);
  else{record(t.key);if(t.src)setSource(t.src);else launch(t.id)}}
-function init(){PX=[];
+function init(){PX=[];mkBg();var fo=document.createElement("div");fo.id="focus";$("strip").appendChild(fo);
  var av=$("ava");if(AVATAR)av.style.backgroundImage="url("+AVATAR+")";else av.innerHTML=IC.user;
  $("right").innerHTML=IC.monitor;
  var px=0;PANELS.forEach(function(P,p){PX[p]=px;px+=P.cols*U-8+GAP;
@@ -154,23 +169,44 @@ function init(){PX=[];
  PANELS.forEach(function(P,p){buildPanel(p)});
  $("strip").style.webkitTransform=$("strip").style.transform="translateX("+(MARGIN-PX[curPanel])+"px)";
  sel(tiles[1][1])}
-function refreshHome(){var idx=cur&&cur.kind=="tile"&&cur.p==1,old=cur;buildPanel(1);if(idx)sel(tiles[1][1])}
+function refreshHome(){var idx=cur&&cur.kind=="tile"&&cur.p==1;buildPanel(1);if(idx)sel(tiles[1][1]);else updatePreview()}
 function updCount(){var a=document.getElementsByClassName("pcount");for(var i=0;i<a.length;i++)if(apps.length)a[i].innerHTML=apps.length+" apps<br>instaladas"}
 function loadApps(cb){try{tizen.application.getAppsInfo(function(a){apps=a.sort(function(x,y){return x.name.localeCompare(y.name)});updCount();cb&&cb()},function(e){cb&&cb(e.message)})}catch(e){cb&&cb("x")}}
-function openApps(){mode="apps";$("apps").style.display="block";$("list").innerHTML="Cargando…";
+function openApps(){stopPreview();mode="apps";$("apps").style.display="block";$("list").innerHTML="Cargando…";
  loadApps(function(err){if(err&&!apps.length)apps=[{name:"(prueba en PC)",id:"sin.tizen"}];ai=0;draw()})}
 function draw(){var L=$("list");L.innerHTML="";apps.forEach(function(a,i){var d=document.createElement("div");d.className="it"+(i==ai?" sel":"");
  d.innerHTML=a.name+"<small>"+a.id+"</small>";L.appendChild(d)});var s=L.children[ai];if(s)L.scrollTop=Math.max(0,s.offsetTop-L.offsetTop-300)}
 document.addEventListener("keydown",function(e){var k=e.keyCode;
- if(mode=="apps"){if(k==10009||k==8){mode="home";$("apps").style.display="none"}
+ if(mode=="apps"){if(k==10009||k==8){mode="home";$("apps").style.display="none";updatePreview()}
   else if(k==13&&apps[ai])launch(apps[ai].id);
   else{var m={37:-1,39:1,38:-3,40:3}[k];if(m){ai=Math.max(0,Math.min(apps.length-1,ai+m));draw()}}return}
  if(k==37)move(-1,0);else if(k==39)move(1,0);else if(k==38)move(0,-1);else if(k==40)move(0,1);
  else if(k==13){if(cur.kind=="tab")move(0,1);else act(cur)}
  else if(k==10009||k==8){if(curPanel!=1)sel(tiles[1][1]);else exitApp()}});
-document.addEventListener("visibilitychange",function(){if(!document.hidden)refreshHome()});
+document.addEventListener("visibilitychange",function(){if(document.hidden)stopPreview();else refreshHome()});
 function tick(){var d=new Date(),h=d.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"}),a=document.getElementsByClassName("pclk"),i;
  $("clk").textContent=h;$("dt").textContent=d.toLocaleDateString("es-CO",{weekday:"short",day:"numeric",month:"short"});
  for(i=0;i<a.length;i++)a[i].textContent=h}
-init();setInterval(tick,15000);loadApps();
+var bgs=[];
+function mkBg(){if(typeof tizen==="undefined")document.documentElement.style.background="#101010";
+ for(var i=0;i<4;i++){var d=document.createElement("div");d.className="bgf";document.body.insertBefore(d,document.body.firstChild);bgs.push(d)}setHole(null)}
+function box(d,x,y,w,h){d.style.left=x+"px";d.style.top=y+"px";d.style.width=w+"px";d.style.height=h+"px"}
+function setHole(r){if(!r){box(bgs[0],0,0,1920,1080);box(bgs[1],0,0,0,0);box(bgs[2],0,0,0,0);box(bgs[3],0,0,0,0);return}
+ box(bgs[0],0,0,1920,r.y);box(bgs[1],0,r.y+r.h,1920,1080-r.y-r.h);box(bgs[2],0,r.y,r.x,r.h);box(bgs[3],r.x+r.w,r.y,1920-r.x-r.w,r.h)}
+// ---- vista previa en vivo de la entrada de video (mejor esfuerzo: requiere la API tvwindow de Samsung)
+var pvKey="",pvT=0;
+function stopPreview(){clearTimeout(pvT);if(!pvKey)return;pvKey="";try{tizen.tvwindow.hide(function(){},function(){},"MAIN")}catch(e){}
+ setHole(null);var e=document.querySelector(".live");if(e)e.classList.remove("live")}
+function updatePreview(){var it=tiles[1]&&tiles[1][1];
+ if(!(PREVIEW&&it&&cur===it&&it.t.src&&mode=="home")){stopPreview();return}
+ var s=it.t.src;if(pvKey==s.n)return;stopPreview();pvKey=s.n;
+ pvT=setTimeout(function(){var t=it.t,r={x:MARGIN+(t.c-1)*U,y:300+(t.r-1)*U,w:t.w*U-8,h:t.h*U-8},fail=function(){pvKey=""};
+  try{tizen.tvwindow.setSource({type:s.type,number:s.num},function(){
+   tizen.tvwindow.show(function(){setHole(r);it.el.classList.add("live")},fail,[r.x+"px",r.y+"px",r.w+"px",r.h+"px"],"MAIN")},fail,"MAIN")}catch(e){fail()}},650)}
+// ---- YouTube en tendencia (opcional)
+function loadYT(){if(!YT_KEY)return;var x=new XMLHttpRequest();
+ x.open("GET","https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&maxResults=1&regionCode="+YT_REGION+"&key="+YT_KEY);
+ x.onload=function(){try{var v=JSON.parse(x.responseText).items[0].snippet;BANNERS[1].img=v.thumbnails.high.url;BANNERS[1].title=v.title;
+  var k=cur&&cur.kind=="tile"&&cur.p==1?cur.i:-1;buildPanel(1);if(k>=0)sel(tiles[1][k])}catch(e){}};x.send()}
+init();setInterval(tick,15000);loadApps();loadYT();
 </script></body></html>
