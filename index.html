@@ -46,6 +46,7 @@ html,body{width:1920px;height:1080px;overflow:hidden;background:transparent;colo
 #rfree{position:absolute;left:0;width:385px;top:826px;text-align:center;font-size:20px}
 #ahead{position:absolute;top:232px;font-size:20px;line-height:26px;color:#bbb}
 #ahead b{display:block;color:#fff;font-weight:600}
+#astat{position:absolute;left:0;right:0;top:420px;text-align:center;font-size:30px;font-weight:300;color:#888}
 #aview{position:absolute;top:280px;height:600px;right:0;overflow:hidden}
 #astrip{position:absolute;left:0;top:20px;width:8000px;height:560px;transition:transform .3s cubic-bezier(.22,.8,.2,1)}
 #ui{position:absolute;left:0;top:0;width:1920px;height:1080px}
@@ -95,7 +96,7 @@ html,body{width:1920px;height:1080px;overflow:hidden;background:transparent;colo
 <div id="view"><div id="strip"></div></div>
 </div>
 <div id="foot"><div id="dt"></div><div id="clk"></div></div>
-<div id="apps"><div id="top2"><div id="ava2"></div></div><div id="right2"></div><div id="asb"><svg id="ring" viewBox="0 0 160 160" width="160" height="160"><circle cx="80" cy="80" r="70" fill="none" stroke="#1f1f1f" stroke-width="7"/><circle id="rfg" cx="80" cy="80" r="70" fill="none" stroke="#8ea3b3" stroke-width="7" transform="rotate(-90 80 80)" stroke-dasharray="0 440"/></svg><div id="rpct"></div><div id="rusd">usado</div><div id="rfree"></div></div><div id="ahead"><b>Instaladas</b>Recientes y A–Z</div><div id="aview"><div id="astrip"><div id="afocus"></div></div></div></div>
+<div id="apps"><div id="top2"><div id="ava2"></div></div><div id="right2"></div><div id="asb"><svg id="ring" viewBox="0 0 160 160" width="160" height="160"><circle cx="80" cy="80" r="70" fill="none" stroke="#1f1f1f" stroke-width="7"/><circle id="rfg" cx="80" cy="80" r="70" fill="none" stroke="#8ea3b3" stroke-width="7" transform="rotate(-90 80 80)" stroke-dasharray="0 440"/></svg><div id="rpct"></div><div id="rusd">usado</div><div id="rfree"></div></div><div id="ahead"><b>Instaladas</b>Recientes y A–Z</div><div id="astat"></div><div id="aview"><div id="astrip"><div id="afocus"></div></div></div></div>
 <div id="pf"><div id="pfbar"><div id="pfr"></div></div><div id="pft">¿Quién eres?</div><div id="pfl">TÚ</div><div id="pfc"><div id="pfn"><i></i>Invitado</div><div id="pfs">Samsung TV · Tizen</div></div><div id="pfb">Cerrar</div><div id="pfocus"></div></div>
 <div id="cm"><div id="cmt"></div><div id="cmg"></div><div id="cma"></div><div id="mfocus"></div></div>
 <div id="cp"><div id="cpt">Elige tu color</div><div id="cpr"></div><div id="cpg"><div id="cfocus"></div></div></div>
@@ -114,7 +115,7 @@ var APPS={
 // Apps del sistema: ID por defecto + patrón por nombre. SETTINGS_ID/BROWSER_ID/STORE_ID (si los llenas) tienen prioridad.
 var SYSAPP={
  settings:{ids:["org.tizen.menu"],re:/^(ajustes|settings|configuraci)/i,cfg:function(){return SETTINGS_ID}},
- browser:{ids:["org.tizen.browser"],re:/^(internet|navegador|samsung internet|web browser)/i,cfg:function(){return BROWSER_ID}},
+ browser:{ids:["org.tizen.browser","com.samsung.tv.knox-browser"],re:/^(internet|navegador|samsung internet|web browser)/i,cfg:function(){return BROWSER_ID}},
  store:{ids:["com.samsung.tv.store","org.volt.apps"],re:/^(apps|samsung apps|tienda|galaxy store)$/i,cfg:function(){return STORE_ID}}
 };
 // Cambiar de fuente desde una app suele estar bloqueado en TVs Samsung 2017.
@@ -130,7 +131,9 @@ var STORE_ID="";    // opcional: fuerza el ID de la tienda de apps
 var PRESS=0.08; // grosor máximo del borde negro al pulsar OK (fracción del lado del tile)
 var AR=3;       // filas por columna: los tiles se llenan primero hacia abajo
 var SOUNDS={move:"sounds/move.wav",select:"sounds/select.wav",open:"sounds/open.wav",back:"sounds/back.wav",page:"sounds/page.wav"}; // reemplaza estos archivos por los tuyos
-var VOLUME=0.6;
+var VOLUME=0.8;
+var BROWSER_URL="https://www.google.com"; // página que abre el navegador del TV
+var SHOW_ALL=false; // true = Mis apps muestra TODO lo que reporta el TV (incluye servicios)
 var HIDE=[];    // IDs de apps que NO quieres ver en Mis apps
 var AVATAR="";      // ruta de una imagen dentro del proyecto, ej. "avatar.png"; vacío = icono genérico
 // Banners de la derecha. Netflix y Prime no tienen API pública: puedes poner tu propia imagen (img) y texto.
@@ -171,6 +174,11 @@ function launchList(ids,name){if(!ids.length){toast("Falta el ID de "+name+". B�
  var i=0;(function next(){var id=ids[i++],more=function(e){if(i<ids.length)next();else toast("No se pudo abrir "+name+" ("+id+"): "+errTxt(e))};
   try{tizen.application.launch(id,function(){},more)}catch(e){more(e)}})()}
 function launch(id){launchList(id?[id]:[],"la app")}
+function launchBrowser(ids){if(!ids.length){toast("Falta el ID del navegador.");return}
+ var i=0;(function next(){var id=ids[i++],more=function(e){if(i<ids.length)next();else toast("No se pudo abrir el navegador ("+id+"): "+errTxt(e))},
+  plain=function(){try{tizen.application.launch(id,function(){},more)}catch(e){more(e)}};
+  try{tizen.application.launchAppControl(new tizen.ApplicationControl("http://tizen.org/appcontrol/operation/view",BROWSER_URL),id,function(){},plain)}catch(e){plain()}})()}
+var lastDbg="";function dbg(m){if(m!=lastDbg){lastDbg=m;toast(m)}}
 // IDs candidatos: 1) instalados con ID conocido, 2) instalados por nombre, 3) IDs por defecto
 function pick(def,re,extra){var out=extra?[extra]:[];
  apps.forEach(function(x){if(def.indexOf(x.id)>=0&&out.indexOf(x.id)<0)out.push(x.id)});
@@ -191,10 +199,11 @@ function switchSource(s){
    tizen.application.launchAppControl(new tizen.ApplicationControl("http://tizen.org/appcontrol/operation/default",null,null,null,d),"org.tizen.tv-viewer",function(){},function(e){toast("No se pudo cambiar a "+s.n+": "+errTxt(e))})}
   catch(e){toast("No se pudo cambiar a "+s.n+": "+errTxt(e))}};
  var set=function(raw){try{tizen.tvwindow.setSource(raw,done,function(e){viaViewer(errTxt(e))},"MAIN")}catch(e){viaViewer(errTxt(e))}};
- var plain={type:s.type,number:s.num};
+ rawSource(s,set)}
+function rawSource(s,cb){var plain={type:s.type,number:s.num};
  try{tizen.systeminfo.getPropertyValue("VIDEOSOURCE",function(v){var all=(v.connected||[]).concat(v.disconnected||[]),raw=null,i;
-  for(i=0;i<all.length;i++)if(all[i].type==s.type&&(s.type=="TV"||all[i].number==s.num)){raw=all[i];break}set(raw||plain)},function(){set(plain)})}
- catch(e){set(plain)}}
+  for(i=0;i<all.length;i++)if(all[i].type==s.type&&(s.type=="TV"||all[i].number==s.num)){raw=all[i];break}cb(raw||plain)},function(){cb(plain)})}
+ catch(e){cb(plain)}}
 // ---- recientes (se guardan al lanzar desde OneDash) ----
 function esc(x){return String(x).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
 function hue(n){var h=0,i;for(i=0;i<n.length;i++)h+=n.charCodeAt(i);return h%360}
@@ -279,6 +288,7 @@ function run(t){var k=t.key||"",c=k.charAt(0);
  if(t.src)return switchSource(t.src);
  if(t.act=="settings")return launchList(sysIds("settings"),"Ajustes");
  if(c=="a")return launchList(idsFor(k.slice(2)),t.tag||t.n);
+ if(k=="y:browser")return launchBrowser(sysIds("browser"));
  if(c=="y")return launchList(sysIds(k.slice(2)),t.n);
  launchList(t.id?[t.id]:[],t.n||"la app")}
 function act(it){var t=it.t;if(!t)return;
@@ -300,7 +310,19 @@ function refreshAll(){var was=cur&&cur.kind=="tile",p=curPanel,i;for(i=0;i<PANEL
 function rebuildKeep(){var k=cur&&cur.kind=="tile"?cur:null,p=k?k.p:0,i=k?k.i:0,q;for(q=0;q<PANELS.length;q++)buildPanel(q);layout();
  if(k){var a=tiles[p]||[],t=a[Math.min(i,a.length-1)];if(t){cur=t;t.el.classList.add("sel");placeFocus(t)}else sel(tabs[p])}}
 function updCount(){var a=document.getElementsByClassName("pcount");for(var i=0;i<a.length;i++)if(apps.length)a[i].innerHTML=apps.length+" apps<br>instaladas"}
-function loadApps(cb){try{tizen.application.getAppsInfo(function(a){var me="";try{me=tizen.application.getCurrentApplication().appInfo.id}catch(e){}apps=a.filter(function(x){return HIDE.indexOf(x.id)<0&&x.id!=me}).sort(function(x,y){return x.name.localeCompare(y.name)});updCount();cb&&cb()},function(e){cb&&cb(e.message)})}catch(e){cb&&cb("x")}}
+var STOREID=/^[A-Za-z0-9]{10}\.[A-Za-z0-9_-]+$/,NUMID=/^\d{9,13}$/,
+ SYSOK=["org.tizen.netflix-app","org.tizen.primevideo","org.tizen.browser","org.tizen.apple.apple-music","com.samsung.tv.aria-video","com.samsung.tv.gallery","com.samsung.tv.cobalt-yt","com.samsung.tv.store","org.volt.apps","org.tizen.menu"],
+ NOISE=/service|worker|preview|promotion|plugin|launcher|test|sdk|^ep[ -]|factory|daemon|dummy|agent|e-?manual|account|adplayer|privacy|security|widget|update/i;
+function consumer(a,me){if(!a||!a.id||!a.name||a.id==me||HIDE.indexOf(a.id)>=0)return false;if(SHOW_ALL)return true;
+ if(SYSOK.indexOf(a.id)>=0||catKey(a.id,a.name).charAt(0)!="x")return true;
+ if(a.show===false||(!STOREID.test(a.id)&&!NUMID.test(a.id)))return false;return !NOISE.test(a.name)}
+function loadApps(cb){var done=0,tm=setTimeout(function(){if(!done){done=1;cb&&cb("el TV no respondió")}},6000);
+ try{tizen.application.getAppsInfo(function(a){if(done)return;done=1;clearTimeout(tm);
+  try{var me="",seen={};try{me=tizen.application.getCurrentApplication().appInfo.id}catch(e){}
+   apps=Array.prototype.slice.call(a).filter(function(x){if(!consumer(x,me))return false;var k=x.name.toLowerCase();if(seen[k])return false;seen[k]=1;return true})
+    .sort(function(x,y){return x.name.localeCompare(y.name)})}catch(e){}
+  updCount();cb&&cb()},function(e){if(done)return;done=1;clearTimeout(tm);cb&&cb(errTxt(e)||"error")})}
+ catch(e){clearTimeout(tm);if(!done){done=1;cb&&cb(errTxt(e)||"x")}}}
 var stor=null,aitems=[],ascroll=0,GL=130;
 function loadStorage(){try{tizen.systeminfo.getPropertyValue("STORAGE",function(r){var u=r.units||[],x=u[0],i;for(i=0;i<u.length;i++)if(u[i].type=="INTERNAL"){x=u[i];break}
  if(x&&x.capacity>0)stor={used:1-x.availableCapacity/x.capacity,free:x.availableCapacity}},function(){})}catch(e){}}
@@ -331,8 +353,12 @@ function arrive(el,from){el.classList.add("nt0",from);el.offsetWidth;el.classLis
 function restoreUI(){var e=$(mode=="apps"?"apps":"ui");e.classList.remove("z-in");e.classList.remove("z-out")}
 function openApps(){stopPreview();mode="apps";setRing();loadStorage();sfx("open");
  $("aview").style.left=(GL-10)+"px";$("ahead").style.left=GL+"px";
- loadApps(function(err){if(err&&!apps.length){for(var i=0;i<14;i++)apps.push({name:"App "+(i+1),id:"x"+i,iconPath:""})}
-  buildApps();var A=$("apps");A.style.display="block";arrive(A,"z-in")})}
+ var A=$("apps"),st=$("astat"),S=$("astrip"),old=S.querySelectorAll(".tile"),i;for(i=0;i<old.length;i++)S.removeChild(old[i]);aitems=[];
+ st.textContent="Cargando apps…";st.style.display="block";A.style.display="block";arrive(A,"z-in");
+ loadApps(function(err){if(mode!="apps")return;
+  if(err&&!apps.length&&typeof tizen==="undefined"){for(var j=0;j<14;j++)apps.push({name:"App "+(j+1),id:"x"+j,iconPath:""})}
+  try{buildApps()}catch(e){st.textContent="Error al mostrar las apps: "+errTxt(e);return}
+  if(aitems.length)st.style.display="none";else st.textContent="No se encontraron apps"+(err?" ("+err+")":"")})}
 function closeApps(){if(busy)return;busy=1;sfx("back");leave($("apps"),"out");
  setTimeout(function(){var A=$("apps");A.style.display="none";A.classList.remove("z-out");mode="home";busy=0;restoreUI();updatePreview()},230)}
 function openTile(c){busy=1;sfx("select");pressFx(c.el);leave($("ui"),"in");
@@ -395,8 +421,8 @@ function unrec(k){try{localStorage.setItem("od_rec",JSON.stringify(stored().filt
 function enterHome(){if(cur.kind=="tab")move(0,1);else if(cur.kind=="top")openProfile();else openTile(cur)}
 function enterApps(){var it=aitems[ai];if(it){busy=1;sfx("select");pressFx(it.el);leave($("apps"),"in");setTimeout(function(){busy=0;record(it.t.key);run(it.t);setTimeout(function(){if(!document.hidden)restoreUI()},1800)},230)}}
 var AUD={};
-function sfx(n){try{var a=AUD[n];if(!a){a=AUD[n]=new Audio(SOUNDS[n]);a.volume=VOLUME}a.currentTime=0;var p=a.play();if(p&&p.catch)p.catch(function(){})}catch(e){}}
-function loadSounds(){for(var n in SOUNDS){try{var a=AUD[n]=new Audio(SOUNDS[n]);a.preload="auto";a.volume=VOLUME}catch(e){}}}
+function sfx(n){try{var p=AUD[n];if(!p)return;var a=p.l[p.i=(p.i+1)%p.l.length];a.currentTime=0;var r=a.play();if(r&&r.catch)r.catch(function(){})}catch(e){}}
+function loadSounds(){for(var n in SOUNDS){(function(n){AUD[n]={i:0,l:[0,1,2].map(function(){var a=new Audio(SOUNDS[n]);a.preload="auto";a.volume=VOLUME;try{a.load()}catch(e){}return a})}})(n)}}
 document.addEventListener("keydown",function(e){var k=e.keyCode;if(busy)return;
  if(k==13&&e.repeat)return;
  if(k==13&&(mode=="home"||mode=="apps")){if(hold)clearTimeout(hold.t);hold={d:0,t:setTimeout(function(){if(hold){hold.d=1;openMenu()}},550)};return}
@@ -427,12 +453,14 @@ function setHole(r){if(!r){box(bgs[0],0,0,1920,1080);box(bgs[1],0,0,0,0);box(bgs
 var pvKey="",pvT=0;
 function stopPreview(){clearTimeout(pvT);if(!pvKey)return;pvKey="";try{tizen.tvwindow.hide(function(){},function(){},"MAIN")}catch(e){}
  setHole(null);var e=document.querySelector(".live");if(e)e.classList.remove("live")}
+var pvBad="";
 function updatePreview(){var it=tiles[1]&&tiles[1][0];
  if(!(PREVIEW&&it&&cur===it&&it.t.src&&mode=="home")){stopPreview();return}
- var s=it.t.src;if(pvKey==s.n)return;stopPreview();pvKey=s.n;
- pvT=setTimeout(function(){var t=it.t,r={x:MARGIN+(t.c-1)*U,y:300+(t.r-1)*U,w:t.w*U-8,h:t.h*U-8},fail=function(){pvKey=""};
-  try{tizen.tvwindow.setSource({type:s.type,number:s.num},function(){
-   tizen.tvwindow.show(function(){setHole(r);it.el.classList.add("live")},fail,[r.x+"px",r.y+"px",r.w+"px",r.h+"px"],"MAIN")},fail,"MAIN")}catch(e){fail()}},650)}
+ var s=it.t.src;if(pvKey==s.n||pvBad==s.n)return;stopPreview();pvKey=s.n;
+ pvT=setTimeout(function(){var t=it.t,r={x:MARGIN+(t.c-1)*U,y:300+(t.r-1)*U,w:t.w*U-8,h:t.h*U-8},
+  fail=function(e){pvKey="";pvBad=s.n;dbg("Vista previa no disponible: "+errTxt(e))};
+  rawSource(s,function(raw){try{tizen.tvwindow.setSource(raw,function(){
+   try{tizen.tvwindow.show(function(){if(pvKey==s.n){setHole(r);it.el.classList.add("live")}else{try{tizen.tvwindow.hide(function(){},function(){},"MAIN")}catch(e){}}},fail,[r.x+"px",r.y+"px",r.w+"px",r.h+"px"],"MAIN")}catch(e){fail(e)}},fail,"MAIN")}catch(e){fail(e)}})},650)}
 // ---- YouTube en tendencia (opcional)
 function loadYT(){if(!YT_KEY)return;var x=new XMLHttpRequest();
  x.open("GET","https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&maxResults=1&regionCode="+YT_REGION+"&key="+YT_KEY);
